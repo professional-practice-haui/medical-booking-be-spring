@@ -2,6 +2,7 @@ package com.professionalpractice.medicalbookingbespring.dtos;
 
 import com.professionalpractice.medicalbookingbespring.dtos.common.DateAuditingDto;
 import lombok.*;
+import java.util.List;
 
 
 @Getter
@@ -17,4 +18,6 @@ public class UserDto extends DateAuditingDto {
     private String email;
 
     private Boolean status;
+
+    private List<String> roles;
 }
