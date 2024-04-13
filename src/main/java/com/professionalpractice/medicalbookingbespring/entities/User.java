@@ -3,6 +3,9 @@ package com.professionalpractice.medicalbookingbespring.entities;
 import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,15 +18,20 @@ public class User extends DateAuditing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name")
     private String fullName;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email",  nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password",  nullable = false)
     private String password;
 
-    @Column(name = "status", columnDefinition = "tinyint default 0")
+    @Column(name = "status")
     private boolean status;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "role", columnDefinition = "json", nullable = false)
+    private List<String> roles;
+
 }

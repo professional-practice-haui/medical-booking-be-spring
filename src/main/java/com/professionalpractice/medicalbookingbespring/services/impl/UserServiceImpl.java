@@ -5,24 +5,22 @@
     import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
     import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
     import com.professionalpractice.medicalbookingbespring.services.UserService;
+    import lombok.RequiredArgsConstructor;
     import org.modelmapper.ModelMapper;
-    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.security.crypto.bcrypt.BCrypt;
     import org.springframework.stereotype.Service;
-
     import java.time.LocalDateTime;
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Optional;
 
     @Service
-    public class UserServiceImpl implements UserService {
+    @RequiredArgsConstructor
+    public class    UserServiceImpl implements UserService {
 
-        @Autowired
-        private UserRepository userRepository;
+        private final UserRepository userRepository;
 
-        @Autowired
-        private ModelMapper modelMapper;
+        private final ModelMapper modelMapper;
 
         @Override
         public List<UserDto> getUsers() {
