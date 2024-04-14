@@ -1,6 +1,7 @@
 package com.professionalpractice.medicalbookingbespring.controllers;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
+import com.professionalpractice.medicalbookingbespring.dtos.LoginDto;
 import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 import com.professionalpractice.medicalbookingbespring.entities.User;
 import com.professionalpractice.medicalbookingbespring.services.UserService;
@@ -38,4 +39,6 @@ public class UserController {
 
         return CustomResponse.success(user);
     }
+
+
 }

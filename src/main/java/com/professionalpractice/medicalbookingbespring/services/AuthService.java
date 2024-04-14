@@ -5,5 +5,6 @@ import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 
 public interface AuthService {
 
-    UserDto login (LoginDto body);
+    String login (LoginDto body) throws Exception;
+
 }
