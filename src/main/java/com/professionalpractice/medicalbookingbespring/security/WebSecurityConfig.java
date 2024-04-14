@@ -1,19 +1,14 @@
 package com.professionalpractice.medicalbookingbespring.security;
 
-import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import static org.springframework.http.HttpMethod.*;
 
 @Configuration
@@ -22,38 +17,21 @@ import static org.springframework.http.HttpMethod.*;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-//  private final JwtTokenFilter jwtTokenFilter;
-    private final UserRepository userRepository;
+    private final JwtTokenFilter jwtTokenFilter;
 
-    private final JwtUserDetailsService jwtUserDetailsService;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(jwtUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config
-    ) throws Exception {
-        return config.getAuthenticationManager();
-    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(configurer ->
                     configurer
-                            .requestMatchers(GET, "/api/v1/users").hasRole("USER")
+                            .requestMatchers("/api/v1/auth/login")
+                            .permitAll()
+                            .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                             .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+
+
 
                             );
 
