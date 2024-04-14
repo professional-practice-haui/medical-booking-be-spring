@@ -4,10 +4,17 @@
     import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
     import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
     import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
+    import com.professionalpractice.medicalbookingbespring.security.CustomUserDetails;
+    import com.professionalpractice.medicalbookingbespring.security.JwtTokenUtil;
     import com.professionalpractice.medicalbookingbespring.services.UserService;
     import lombok.RequiredArgsConstructor;
     import org.modelmapper.ModelMapper;
+    import org.springframework.dao.DataIntegrityViolationException;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.authentication.BadCredentialsException;
+    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
     import org.springframework.security.crypto.bcrypt.BCrypt;
+    import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.stereotype.Service;
     import java.time.LocalDateTime;
     import java.util.ArrayList;
@@ -21,6 +28,12 @@
         private final UserRepository userRepository;
 
         private final ModelMapper modelMapper;
+
+        private final JwtTokenUtil jwtTokenUtil;
+
+        private final AuthenticationManager authenticationManager;
+
+        private final PasswordEncoder passwordEncoder;
 
         @Override
         public List<UserDto> getUsers() {
@@ -36,7 +49,7 @@
         public UserDto createUser(User userBody) {
             Optional<User> user = userRepository.findByEmail(userBody.getEmail());
             if (user.isPresent()) {
-                throw new BadRequestException("Email đã tồn tại");
+                throw new DataIntegrityViolationException("Email đã tồn tại");
             }
 
             String hashPassword = BCrypt.hashpw(userBody.getPassword(), BCrypt.gensalt(10));
@@ -65,4 +78,6 @@
 
             return modelMapper.map(user, UserDto.class);
         }
+
+
     }
