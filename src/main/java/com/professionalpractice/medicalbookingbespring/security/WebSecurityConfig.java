@@ -9,7 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -23,21 +24,14 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(configurer ->
-                    configurer
-                            .requestMatchers("/api/v1/auth/login")
-                            .permitAll()
-                            .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
-                            .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
-
-
-
-                            );
-
-        http.httpBasic();
-
-        http.csrf().disable();
+            .csrf(csrf -> csrf.disable())
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth ->
+                auth
+                    .requestMatchers("/api/v1/auth/**").permitAll()
+                    .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
+                    .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+            );
 
         return http.build();
     }
