@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDto {
-    UserDto userDto;
+    UserDto user;
     List<String> roles;
     String token;
 }
