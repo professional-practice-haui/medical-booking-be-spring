@@ -20,42 +20,46 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<RestData<?>> handlerNotFoundException(NotFoundException ex) {
-    String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
-    log.error(message, ex);
-    return CustomResponse.error(HttpStatus.NOT_FOUND, message);
+
+      log.error(ex.getMessage(), ex);
+
+    return CustomResponse.error(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<RestData<?>> handlerInvalidException(BadRequestException ex) {
-    log.error(ex.getMessage(), ex);
-    String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
-    return CustomResponse.error(HttpStatus.BAD_REQUEST, message);
+      log.error(ex.getMessage(), ex);
+    return CustomResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());
   }
 
   @ExceptionHandler(InternalServerException.class)
   public ResponseEntity<RestData<?>> handlerInternalServerException(InternalServerException ex) {
-    String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
-    log.error(message, ex);
-    return CustomResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, message);
+
+
+      log.error(ex.getMessage(), ex);
+
+    return CustomResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
   }
 
   @ExceptionHandler(UnauthorizedException.class)
   public ResponseEntity<RestData<?>> handleUnauthorizedException(UnauthorizedException ex) {
-    String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
-    log.error(message, ex);
-    return CustomResponse.error(HttpStatus.UNAUTHORIZED, message);
+
+      log.error(ex.getMessage(), ex);
+
+    return CustomResponse.error(HttpStatus.UNAUTHORIZED, ex.getMessage());
   }
 
   @ExceptionHandler(ForbiddenException.class)
   public ResponseEntity<RestData<?>> handleAccessDeniedException(ForbiddenException ex) {
-    String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
-    log.error(message, ex);
-    return CustomResponse.error(HttpStatus.FORBIDDEN, message);
+
+      log.error(ex.getMessage(), ex);
+
+    return CustomResponse.error(HttpStatus.FORBIDDEN, ex.getMessage());
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<RestData<?>> handlerException(Exception ex) {
-    log.error(ex.getMessage(), ex);
+      log.error(ex.getMessage(), ex);
     return CustomResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
   }
 }

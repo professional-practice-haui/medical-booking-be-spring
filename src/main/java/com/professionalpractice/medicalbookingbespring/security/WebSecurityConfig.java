@@ -31,6 +31,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                     .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+                        .anyRequest().authenticated()
             );
 
         return http.build();
