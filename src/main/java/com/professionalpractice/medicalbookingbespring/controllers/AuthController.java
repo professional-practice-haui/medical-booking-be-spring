@@ -22,15 +22,15 @@ public class AuthController {
 
     @PostMapping("/auth/register")
     public ResponseEntity<?> register(@RequestBody User userBody) {
-        UserDto user = userService.createUser(userBody);
+            UserDto user = userService.createUser(userBody);
+            return CustomResponse.success(user);
 
-        return CustomResponse.success(user);
     }
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody LoginDto body) {
         String token = authService.login(body);
-        
         return CustomResponse.success(token);
+
     }
 }
