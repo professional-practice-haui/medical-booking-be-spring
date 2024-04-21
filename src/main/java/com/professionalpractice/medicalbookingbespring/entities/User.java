@@ -1,11 +1,14 @@
 package com.professionalpractice.medicalbookingbespring.entities;
 
 import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
+import com.professionalpractice.medicalbookingbespring.utils.GenderName;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -19,7 +22,7 @@ public class User extends DateAuditing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     String fullName;
 
     @Column(name = "email", nullable = false)
@@ -28,10 +31,22 @@ public class User extends DateAuditing {
     @Column(name = "password", nullable = false)
     String password;
 
-    @Column(name = "status")
-    boolean status;
+    String address;
+
+    String phone;
+
+    @Enumerated(EnumType.STRING)
+    GenderName genderName;
+
+    @Column(name = "date_of_birth")
+    LocalDateTime dateOfBirth;
+
+    @Column(name = "is_locked")
+    Boolean isLocked;
+
+    String avatar = "https://static.vecteezy.com/system/resources/previews/026/619/142/original/default-avatar-profile-icon-of-social-media-user-photo-image-vector.jpg";
 
     @Column(name = "roles", nullable = false)
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    List<Role> roles;
+    Set<Role> roles = new HashSet<>();
 }
