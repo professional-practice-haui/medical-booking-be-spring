@@ -6,18 +6,17 @@ import com.professionalpractice.medicalbookingbespring.entities.User;
 import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
 import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
 import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
-import com.professionalpractice.medicalbookingbespring.security.JwtTokenUtil;
 import com.professionalpractice.medicalbookingbespring.services.UserService;
+import com.professionalpractice.medicalbookingbespring.utils.GenderName;
+import com.professionalpractice.medicalbookingbespring.utils.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +27,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final ModelMapper modelMapper;
-
-    private final JwtTokenUtil jwtTokenUtil;
-
-    private final AuthenticationManager authenticationManager;
-
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserDto> getUsers() {
@@ -54,7 +47,20 @@ public class UserServiceImpl implements UserService {
         String hashPassword = BCrypt.hashpw(userBody.getPassword(), BCrypt.gensalt(10));
         userBody.setPassword(hashPassword);
 
-        userBody.setRoles(Collections.singletonList(new Role("USER")));
+        if (userBody.getGenderName() == null) {
+            userBody.setGenderName(GenderName.OTHER);
+        }
+
+        if (userBody.getRoles() == null) {
+            userBody.setRoles(new HashSet<>());
+        }
+
+        boolean hasUserRole = userBody.getRoles().stream().anyMatch(role -> role.getRoleName().equals("USER"));
+        if (!hasUserRole) {
+            userBody.getRoles().add(new Role(RoleName.USER));
+        }
+
+        userBody.setIsLocked(false);
         userBody.setCreatedDate(LocalDateTime.now());
         userBody.setLastModifiedDate(LocalDateTime.now());
 
