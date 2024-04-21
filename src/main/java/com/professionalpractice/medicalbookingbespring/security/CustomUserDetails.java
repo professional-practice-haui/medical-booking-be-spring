@@ -16,12 +16,11 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private User user;
-
-
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> roles = new ArrayList<>();
-        user.getRoles().forEach(role -> roles.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase())));
+        user.getRoles().forEach(role -> roles.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
         return roles;
     }
 

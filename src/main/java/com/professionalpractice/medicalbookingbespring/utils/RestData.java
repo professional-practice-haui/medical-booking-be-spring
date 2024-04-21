@@ -8,21 +8,21 @@ import lombok.Data;
 @AllArgsConstructor
 public class RestData<T> {
 
-  private Number status;
+    private Number code;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private T message;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private T message;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private T data;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private T data;
 
-  public RestData(Number status, T data) {
-    this.status = status;
-    this.data = data;
-  }
+    public RestData(Number code, T data) {
+        this.code = code;
+        this.data = data;
+    }
 
-  public static RestData<?> error(Number status, Object message) {
-    return new RestData<>(status, message, null);
-  }
+    public static RestData<?> error(Number code, Object message) {
+        return new RestData<>(code, message, null);
+    }
 
 }

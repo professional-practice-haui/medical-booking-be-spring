@@ -1,5 +1,6 @@
 package com.professionalpractice.medicalbookingbespring.entities;
 
+import com.professionalpractice.medicalbookingbespring.utils.RoleName;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,10 +19,16 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    String roleName;
+    @Enumerated(EnumType.STRING)
+    RoleName roleName;
 
-    public Role(String roleName) {
+    public Role(RoleName roleName) {
 
         this.roleName = roleName;
+    }
+
+    public String getRoleName() {
+        
+        return this.roleName.toString();
     }
 }
