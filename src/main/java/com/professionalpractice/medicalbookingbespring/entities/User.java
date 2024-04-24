@@ -3,6 +3,9 @@ package com.professionalpractice.medicalbookingbespring.entities;
 import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
 import com.professionalpractice.medicalbookingbespring.utils.GenderName;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -23,11 +26,14 @@ public class User extends DateAuditing {
     Long id;
 
     @Column(name = "full_name", nullable = false)
+    @NotEmpty(message = "Họ tên không để trống")
     String fullName;
 
+    @Email(message = "Email không hợp lệ")
     @Column(name = "email", nullable = false)
     String email;
 
+    @Size(min = 7, message = "Mật khẩu cần nhiều hơn 7 kí tự")
     @Column(name = "password", nullable = false)
     String password;
 
@@ -35,6 +41,7 @@ public class User extends DateAuditing {
 
     String phone;
 
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     GenderName genderName;
 
