@@ -11,13 +11,13 @@ import com.professionalpractice.medicalbookingbespring.utils.GenderName;
 import com.professionalpractice.medicalbookingbespring.utils.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,13 +28,11 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
 
-    @Override
-    public List<UserDto> getUsers() {
-        List<User> users = userRepository.findAll();
-        List<UserDto> userDTOs = new ArrayList<>();
-        users.forEach(user -> userDTOs.add(modelMapper.map(user, UserDto.class)));
 
-        return userDTOs;
+    @Override
+    public Page<User> getUsers(PageRequest pageRequest) {
+        Page<User> usersPage = userRepository.searchUsers(pageRequest);
+        return usersPage;
     }
 
     @Override
