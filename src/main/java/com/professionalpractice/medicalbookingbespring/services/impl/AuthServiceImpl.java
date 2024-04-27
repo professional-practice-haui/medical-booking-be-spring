@@ -6,6 +6,7 @@ import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 import com.professionalpractice.medicalbookingbespring.entities.Role;
 import com.professionalpractice.medicalbookingbespring.entities.User;
 import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
+import com.professionalpractice.medicalbookingbespring.exceptions.UnauthorizedException;
 import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
 import com.professionalpractice.medicalbookingbespring.security.CustomUserDetails;
 import com.professionalpractice.medicalbookingbespring.security.JwtTokenUtil;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +30,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
@@ -52,4 +55,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Override
+    public LoginResponseDto loginWithToken() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UnauthorizedException("Xác thực thất bại hoặc người dùng chưa đăng nhập");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) principal;
+            User user = userDetails.getUser();
+
+            UserDto userDto = modelMapper.map(user, UserDto.class);
+            List<String> roles = user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
+            String token = jwtTokenUtil.generateToken(user);
+
+            return new LoginResponseDto(userDto, roles, token);
+        } else {
+            throw new UnauthorizedException("Người dùng không hợp lệ");
+        }
+    }
 }

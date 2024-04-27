@@ -34,7 +34,8 @@ public class WebSecurityConfig {
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth ->
                 auth
-                    .requestMatchers("/api/v1/auth/**").permitAll()
+                    .requestMatchers(POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
+                    .requestMatchers(GET, "/api/v1/auth/token").hasRole("USER")
                     .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                     .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
                     .anyRequest().authenticated()

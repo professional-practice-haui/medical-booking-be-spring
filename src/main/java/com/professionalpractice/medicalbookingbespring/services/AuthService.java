@@ -7,4 +7,5 @@ public interface AuthService {
 
     LoginResponseDto login(LoginDto body);
 
+    LoginResponseDto loginWithToken();
 }
