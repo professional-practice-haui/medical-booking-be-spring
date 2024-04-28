@@ -25,7 +25,7 @@ public class UserDto extends DateAuditingDto {
 
     String phone;
 
-    GenderName genderName;
+    GenderName gender;
 
     LocalDateTime dateOfBirth;
 
