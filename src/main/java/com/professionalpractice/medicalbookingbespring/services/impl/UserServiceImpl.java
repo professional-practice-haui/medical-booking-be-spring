@@ -45,8 +45,8 @@ public class UserServiceImpl implements UserService {
         String hashPassword = BCrypt.hashpw(userBody.getPassword(), BCrypt.gensalt(10));
         userBody.setPassword(hashPassword);
 
-        if (userBody.getGenderName() == null) {
-            userBody.setGenderName(GenderName.OTHER);
+        if (userBody.getGender() == null) {
+            userBody.setGender(GenderName.OTHER);
         }
 
         if (userBody.getRoles() == null) {

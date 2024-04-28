@@ -40,10 +40,9 @@ public class User extends DateAuditing {
     String address;
 
     String phone;
-
-    @Column(name = "gender")
+    
     @Enumerated(EnumType.STRING)
-    GenderName genderName;
+    GenderName gender;
 
     @Column(name = "date_of_birth")
     LocalDateTime dateOfBirth;
