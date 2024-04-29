@@ -7,8 +7,11 @@ import org.springframework.util.MultiValueMap;
 
 public class CustomResponse {
 
-    public static ResponseEntity<RestData<?>> success(Object data) {
+    public static ResponseEntity<RestData<?>> success(String message) {
+        return success(HttpStatus.OK, message, null);
+    }
 
+    public static ResponseEntity<RestData<?>> success(Object data) {
         return success(HttpStatus.OK, "Thành công", data);
     }
 
