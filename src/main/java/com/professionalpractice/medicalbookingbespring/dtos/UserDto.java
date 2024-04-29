@@ -1,12 +1,19 @@
 package com.professionalpractice.medicalbookingbespring.dtos;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.professionalpractice.medicalbookingbespring.dtos.common.DateAuditingDto;
+import com.professionalpractice.medicalbookingbespring.entities.Role;
 import com.professionalpractice.medicalbookingbespring.utils.GenderName;
-import lombok.*;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
@@ -23,13 +30,19 @@ public class UserDto extends DateAuditingDto {
 
     String address;
 
-    String phone;
+    String phoneNumber;
 
     GenderName gender;
 
-    LocalDateTime dateOfBirth;
+    LocalDate dateOfBirth;
 
     String avatar;
 
     Boolean isLocked;
+
+    List<String> roles;
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles.stream().map(Role::getRoleName).collect(Collectors.toList());
+    }
 }

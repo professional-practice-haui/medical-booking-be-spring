@@ -14,8 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +37,7 @@ public class WebSecurityConfig {
                     .requestMatchers(GET, "/api/v1/auth/token").hasRole("USER")
                     .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                     .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+                    .requestMatchers(PUT, "/api/v1/users/profile").hasRole("USER")
                     .anyRequest().authenticated()
             );
 
