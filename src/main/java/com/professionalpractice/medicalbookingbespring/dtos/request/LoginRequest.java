@@ -1,4 +1,4 @@
-package com.professionalpractice.medicalbookingbespring.dtos;
+package com.professionalpractice.medicalbookingbespring.dtos.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDto {
+public class LoginRequest {
+
     String email;
+
     String password;
 }

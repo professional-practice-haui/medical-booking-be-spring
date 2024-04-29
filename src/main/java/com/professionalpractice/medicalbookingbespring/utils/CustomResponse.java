@@ -16,6 +16,10 @@ public class CustomResponse {
         return success(status, "Thành công", data);
     }
 
+    public static ResponseEntity<RestData<?>> success(String message, Object data) {
+        return success(HttpStatus.OK, message, data);
+    }
+
     public static ResponseEntity<RestData<?>> success(HttpStatus status, String message, Object data) {
         RestData<?> response = new RestData<>(status.value(), message, data);
         return new ResponseEntity<>(response, status);
@@ -25,7 +29,8 @@ public class CustomResponse {
         return success(HttpStatus.OK, header, data);
     }
 
-    public static ResponseEntity<RestData<?>> success(HttpStatus status, MultiValueMap<String, String> header, Object data) {
+    public static ResponseEntity<RestData<?>> success(HttpStatus status, MultiValueMap<String, String> header,
+            Object data) {
         RestData<?> response = new RestData<>(status.value(), data);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.addAll(header);

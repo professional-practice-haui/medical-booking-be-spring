@@ -1,15 +1,7 @@
 package com.professionalpractice.medicalbookingbespring.controllers;
 
-import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
-import com.professionalpractice.medicalbookingbespring.dtos.LoginDto;
-import com.professionalpractice.medicalbookingbespring.dtos.LoginResponseDto;
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
-import com.professionalpractice.medicalbookingbespring.entities.User;
-import com.professionalpractice.medicalbookingbespring.services.AuthService;
-import com.professionalpractice.medicalbookingbespring.services.UserService;
-import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,7 +10,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
+import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
+import com.professionalpractice.medicalbookingbespring.dtos.request.LoginRequest;
+import com.professionalpractice.medicalbookingbespring.dtos.response.LoginResponse;
+import com.professionalpractice.medicalbookingbespring.entities.User;
+import com.professionalpractice.medicalbookingbespring.services.AuthService;
+import com.professionalpractice.medicalbookingbespring.services.UserService;
+import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestApiV1
@@ -29,12 +31,12 @@ public class AuthController {
 
     @PostMapping("/auth/register")
     public ResponseEntity<?> register(@RequestBody @Valid User userBody,
-                                      BindingResult result) {
+            BindingResult result) {
         if (result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+                    .stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList();
             return CustomResponse.error(HttpStatus.BAD_REQUEST, errorMessages);
         }
         UserDto user = userService.createUser(userBody);
@@ -42,14 +44,14 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto body) {
-        LoginResponseDto loginResponseDto = authService.login(body);
+    public ResponseEntity<?> login(@RequestBody LoginRequest body) {
+        LoginResponse loginResponseDto = authService.login(body);
         return CustomResponse.success(loginResponseDto);
     }
 
     @GetMapping("/auth/token")
     public ResponseEntity<?> loginWithToken() {
-        LoginResponseDto loginResponseDto = authService.loginWithToken();
+        LoginResponse loginResponseDto = authService.loginWithToken();
         return CustomResponse.success(loginResponseDto);
     }
 }
