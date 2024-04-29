@@ -140,6 +140,9 @@ public class UserServiceImpl implements UserService {
             }
             user.setRoles(newRoles);
         }
+        if (userRequest.getIsLocked() != null) {
+            user.setIsLocked(userRequest.getIsLocked());
+        }
 
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
@@ -154,5 +157,14 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
+    }
+
+    @Override
+    public UserDto deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+
+        userRepository.delete(user);
+        return modelMapper.map(user, UserDto.class);
     }
 }

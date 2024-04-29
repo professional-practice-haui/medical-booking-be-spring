@@ -23,4 +23,6 @@ public interface UserService {
     UserDto updateUserById(Long id, UserRequest userRequest);
 
     UserDto lockUserById(Long id);
+
+    UserDto deleteUserById(Long id);
 }
