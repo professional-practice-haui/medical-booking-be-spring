@@ -9,7 +9,7 @@ import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public Page<UserDto> getUsers(PageRequest pageRequest) {
 
@@ -41,34 +43,57 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(User userBody) {
-        Optional<User> user = userRepository.findByEmail(userBody.getEmail());
+    public UserDto createUser(UserRequest userRequest) {
+        Optional<User> user = userRepository.findByEmail(userRequest.getEmail());
         if (user.isPresent()) {
             throw new BadRequestException("Email đã tồn tại");
         }
 
-        String hashPassword = BCrypt.hashpw(userBody.getPassword(), BCrypt.gensalt(10));
-        userBody.setPassword(hashPassword);
+        User newUser = new User();
 
-        if (userBody.getGender() == null) {
-            userBody.setGender(GenderName.OTHER);
+        if (userRequest.getEmail() != null) {
+            newUser.setEmail(userRequest.getEmail());
         }
 
-        if (userBody.getRoles() == null) {
-            userBody.setRoles(new HashSet<>());
+        if (userRequest.getPassword() != null) {
+            String hashPassword = passwordEncoder.encode(userRequest.getPassword());
+            newUser.setPassword(hashPassword);
         }
 
-        boolean hasUserRole = userBody.getRoles().stream().anyMatch(role -> role.getRoleName().equals("USER"));
-        if (!hasUserRole) {
-            userBody.getRoles().add(new Role(RoleName.USER));
+        if (userRequest.getGender() == null) {
+            newUser.setGender(GenderName.OTHER);
         }
 
-        userBody.setIsLocked(false);
-        userBody.setCreatedDate(LocalDateTime.now());
-        userBody.setLastModifiedDate(LocalDateTime.now());
+        if (userRequest.getAddress() != null) {
+            newUser.setAddress(userRequest.getAddress());
+        }
 
-        userRepository.save(userBody);
-        return modelMapper.map(userBody, UserDto.class);
+        if (userRequest.getPhoneNumber() != null) {
+            newUser.setPhoneNumber(userRequest.getPhoneNumber());
+        }
+
+        if (userRequest.getFullName() != null) {
+            newUser.setFullName(userRequest.getFullName());
+        }
+
+        if (userRequest.getDateOfBirth() != null) {
+            newUser.setDateOfBirth(LocalDate.parse(userRequest.getDateOfBirth()));
+        }
+
+        newUser.setRoles(new HashSet<>());
+        newUser.getRoles().add(new Role(RoleName.USER));
+        if (userRequest.getRoles() != null) {
+            for (String roleName : userRequest.getRoles()) {
+                newUser.getRoles().add(new Role(RoleName.valueOf(roleName)));
+            }
+        }
+
+        newUser.setIsLocked(false);
+        newUser.setCreatedDate(LocalDateTime.now());
+        newUser.setLastModifiedDate(LocalDateTime.now());
+
+        userRepository.save(newUser);
+        return modelMapper.map(newUser, UserDto.class);
     }
 
     @Override
@@ -142,6 +167,10 @@ public class UserServiceImpl implements UserService {
         }
         if (userRequest.getIsLocked() != null) {
             user.setIsLocked(userRequest.getIsLocked());
+        }
+        if (userRequest.getPassword() != null) {
+            String hashPassword = passwordEncoder.encode(userRequest.getPassword());
+            user.setPassword(hashPassword);
         }
 
         User savedUser = userRepository.save(user);
