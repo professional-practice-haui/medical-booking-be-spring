@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
 import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 import com.professionalpractice.medicalbookingbespring.dtos.request.LoginRequest;
+import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.LoginResponse;
-import com.professionalpractice.medicalbookingbespring.entities.User;
 import com.professionalpractice.medicalbookingbespring.services.AuthService;
 import com.professionalpractice.medicalbookingbespring.services.UserService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
@@ -30,7 +30,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<?> register(@RequestBody @Valid User userBody,
+    public ResponseEntity<?> register(@RequestBody @Valid UserRequest userRequest,
             BindingResult result) {
         if (result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors()
@@ -39,13 +39,20 @@ public class AuthController {
                     .toList();
             return CustomResponse.error(HttpStatus.BAD_REQUEST, errorMessages);
         }
-        UserDto user = userService.createUser(userBody);
+        UserDto user = userService.createUser(userRequest);
         return CustomResponse.success(HttpStatus.CREATED, "Đăng ký thành công", user);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest body) {
-        LoginResponse loginResponseDto = authService.login(body);
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest loginRequest, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors()
+                    .stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList();
+            return CustomResponse.error(HttpStatus.BAD_REQUEST, errorMessages);
+        }
+        LoginResponse loginResponseDto = authService.login(loginRequest);
         return CustomResponse.success(loginResponseDto);
     }
 

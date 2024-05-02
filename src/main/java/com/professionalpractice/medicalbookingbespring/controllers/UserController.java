@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +21,6 @@ import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
 import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
-import com.professionalpractice.medicalbookingbespring.entities.User;
 import com.professionalpractice.medicalbookingbespring.services.UserService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
 
@@ -46,10 +46,10 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody User userBody) {
-        UserDto user = userService.createUser(userBody);
+    public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
+        UserDto user = userService.createUser(userRequest);
 
-        return CustomResponse.success(user);
+        return CustomResponse.success(HttpStatus.CREATED, "Tạo người dùng mới thành công", user);
     }
 
     @PutMapping("/users/profile")
