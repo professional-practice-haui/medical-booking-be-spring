@@ -1,7 +1,15 @@
 package com.professionalpractice.medicalbookingbespring.controllers;
 
-import java.util.List;
-
+import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
+import com.professionalpractice.medicalbookingbespring.dtos.UserDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.LoginRequest;
+import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
+import com.professionalpractice.medicalbookingbespring.dtos.response.LoginResponse;
+import com.professionalpractice.medicalbookingbespring.services.AuthService;
+import com.professionalpractice.medicalbookingbespring.services.UserService;
+import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -10,17 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
-import com.professionalpractice.medicalbookingbespring.dtos.request.LoginRequest;
-import com.professionalpractice.medicalbookingbespring.dtos.response.LoginResponse;
-import com.professionalpractice.medicalbookingbespring.entities.User;
-import com.professionalpractice.medicalbookingbespring.services.AuthService;
-import com.professionalpractice.medicalbookingbespring.services.UserService;
-import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestApiV1
@@ -30,16 +28,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<?> register(@RequestBody @Valid User userBody,
-            BindingResult result) {
+    public ResponseEntity<?> register(@RequestBody @Valid UserRequest userRequest,
+                                      BindingResult result) {
         if (result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors()
-                    .stream()
-                    .map(FieldError::getDefaultMessage)
-                    .toList();
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .toList();
             return CustomResponse.error(HttpStatus.BAD_REQUEST, errorMessages);
         }
-        UserDto user = userService.createUser(userBody);
+        UserDTO user = userService.createUser(userRequest);
         return CustomResponse.success(HttpStatus.CREATED, "Đăng ký thành công", user);
     }
 

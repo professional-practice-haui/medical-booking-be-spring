@@ -1,15 +1,6 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
+import com.professionalpractice.medicalbookingbespring.dtos.UserDTO;
 import com.professionalpractice.medicalbookingbespring.dtos.request.LoginRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.LoginResponse;
 import com.professionalpractice.medicalbookingbespring.entities.User;
@@ -19,8 +10,15 @@ import com.professionalpractice.medicalbookingbespring.repositories.UserReposito
 import com.professionalpractice.medicalbookingbespring.security.CustomUserDetails;
 import com.professionalpractice.medicalbookingbespring.security.JwtTokenUtil;
 import com.professionalpractice.medicalbookingbespring.services.AuthService;
-
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest body) {
         User user = userRepository.findByEmail(body.getEmail())
-                .orElseThrow(() -> new BadRequestException("Email hoặc mật khẩu không chính xác"));
+            .orElseThrow(() -> new BadRequestException("Email hoặc mật khẩu không chính xác"));
 
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
         if (!passwordEncoder.matches(body.getPassword(), user.getPassword())) {
@@ -43,10 +41,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                body.getEmail(), body.getPassword(), customUserDetails.getAuthorities());
+            body.getEmail(), body.getPassword(), customUserDetails.getAuthorities());
         authenticationManager.authenticate(authenticationToken);
 
-        UserDto userDto = modelMapper.map(user, UserDto.class);
+        UserDTO userDto = modelMapper.map(user, UserDTO.class);
         String token = jwtTokenUtil.generateToken(user);
 
         return new LoginResponse(userDto, token);
@@ -67,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
             CustomUserDetails userDetails = (CustomUserDetails) principal;
             User user = userDetails.getUser();
 
-            UserDto userDto = modelMapper.map(user, UserDto.class);
+            UserDTO userDto = modelMapper.map(user, UserDTO.class);
             String token = jwtTokenUtil.generateToken(user);
 
             return new LoginResponse(userDto, token);

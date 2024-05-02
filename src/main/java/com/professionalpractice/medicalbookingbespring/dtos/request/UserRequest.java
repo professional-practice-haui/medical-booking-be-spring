@@ -1,13 +1,11 @@
 package com.professionalpractice.medicalbookingbespring.dtos.request;
 
-import java.util.List;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +14,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequest {
 
+
     String fullName;
+
+    @NotBlank(message = "Yêu cầu nhập email")
+    @Email(message = "Yêu cầu nhập đúng định dạng email")
+    String email;
 
     String address;
 
@@ -26,9 +29,12 @@ public class UserRequest {
 
     String dateOfBirth;
 
+    @NotBlank(message = "Yêu cầu nhập mật khẩu")
     String password;
 
     Boolean isLocked;
+
+    String avatar;
 
     List<String> roles;
 }

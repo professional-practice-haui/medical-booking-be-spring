@@ -36,8 +36,10 @@ public class WebSecurityConfig {
                     .requestMatchers(POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
                     .requestMatchers(GET, "/api/v1/auth/token").hasRole("USER")
                     .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
-                    .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+                    .requestMatchers(POST, "/api/v1/users").hasRole("USER")
                     .requestMatchers(PUT, "/api/v1/users/profile").hasRole("USER")
+                    .requestMatchers(PUT, "/api/v1/doctors").hasRole("USER")
+                    .requestMatchers(PUT, "/api/v1/departments").hasRole("USER")
                     .anyRequest().authenticated()
             );
 

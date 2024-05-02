@@ -1,28 +1,26 @@
 package com.professionalpractice.medicalbookingbespring.services;
 
+import com.professionalpractice.medicalbookingbespring.dtos.UserDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
-import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
-import com.professionalpractice.medicalbookingbespring.entities.User;
-
 @Service
 public interface UserService {
-    Page<UserDto> getUsers(PageRequest pageRequest);
+    Page<UserDTO> getUsers(PageRequest pageRequest);
 
-    UserDto createUser(User userBody);
+    UserDTO createUser(UserRequest userRequest);
 
-    UserDto getUserById(Long id);
+    UserDTO getUserById(Long id);
 
-    UserDto getUserByEmail(String email);
+    UserDTO getUserByEmail(String email);
 
-    UserDto updateUserProfile(String userEmail, UserRequest userRequest);
+    UserDTO updateUserProfile(String userEmail, UserRequest userRequest);
 
-    UserDto updateUserById(Long id, UserRequest userRequest);
+    UserDTO updateUserById(Long id, UserRequest userRequest);
 
-    UserDto lockUserById(Long id);
+    UserDTO lockUserById(Long id);
 
-    UserDto deleteUserById(Long id);
+    UserDTO deleteUserById(Long id);
 }

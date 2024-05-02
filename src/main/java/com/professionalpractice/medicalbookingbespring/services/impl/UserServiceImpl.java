@@ -1,29 +1,28 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
+import com.professionalpractice.medicalbookingbespring.dtos.UserDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
+import com.professionalpractice.medicalbookingbespring.entities.Role;
+import com.professionalpractice.medicalbookingbespring.entities.User;
+import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
+import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
+import com.professionalpractice.medicalbookingbespring.repositories.RoleRepository;
+import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
+import com.professionalpractice.medicalbookingbespring.services.UserService;
+import com.professionalpractice.medicalbookingbespring.utils.GenderName;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
-import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
-import com.professionalpractice.medicalbookingbespring.entities.Role;
-import com.professionalpractice.medicalbookingbespring.entities.User;
-import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
-import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
-import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
-import com.professionalpractice.medicalbookingbespring.services.UserService;
-import com.professionalpractice.medicalbookingbespring.utils.GenderName;
-import com.professionalpractice.medicalbookingbespring.utils.RoleName;
-
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,140 +30,164 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final RoleRepository roleRepository;
+
     private final ModelMapper modelMapper;
 
     @Override
-    public Page<UserDto> getUsers(PageRequest pageRequest) {
+    public Page<UserDTO> getUsers(PageRequest pageRequest) {
 
         Page<User> usersPage = userRepository.queryUsers(pageRequest);
-        return usersPage.map(user -> modelMapper.map(user, UserDto.class));
+        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     @Override
-    public UserDto createUser(User userBody) {
-        Optional<User> user = userRepository.findByEmail(userBody.getEmail());
+    public UserDTO createUser(UserRequest userRequest) {
+        Optional<User> user = userRepository.findByEmail(userRequest.getEmail());
         if (user.isPresent()) {
             throw new BadRequestException("Email đã tồn tại");
         }
+        String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt(10));
 
-        String hashPassword = BCrypt.hashpw(userBody.getPassword(), BCrypt.gensalt(10));
-        userBody.setPassword(hashPassword);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        if (userBody.getGender() == null) {
-            userBody.setGender(GenderName.OTHER);
-        }
+        LocalDate dateOfBirth = LocalDate.parse(userRequest.getDateOfBirth(), formatter);
+        // Chuyển đổi chuỗi thành LocalDate
 
-        if (userBody.getRoles() == null) {
-            userBody.setRoles(new HashSet<>());
-        }
+        User theUser = User.builder()
+            .fullName(userRequest.getFullName())
+            .address(userRequest.getAddress())
+            .isLocked(false)
+            .avatar(userRequest.getAvatar())
+            .password(hashPassword)
+            .email(userRequest.getEmail())
+            .phoneNumber(userRequest.getPhoneNumber())
+            .gender(checkGender(userRequest.getGender()))
+            .roles(convertRoles(userRequest.getRoles()))
+            .dateOfBirth(dateOfBirth)
+            .build();
 
-        boolean hasUserRole = userBody.getRoles().stream().anyMatch(role -> role.getRoleName().equals("USER"));
-        if (!hasUserRole) {
-            userBody.getRoles().add(new Role(RoleName.USER));
-        }
-
-        userBody.setIsLocked(false);
-        userBody.setCreatedDate(LocalDateTime.now());
-        userBody.setLastModifiedDate(LocalDateTime.now());
-
-        userRepository.save(userBody);
-        return modelMapper.map(userBody, UserDto.class);
+        User saveUser = userRepository.save(theUser);
+        return modelMapper.map(saveUser, UserDTO.class);
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
+    public UserDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
-    public UserDto updateUserProfile(String userEmail, UserRequest userRequest) {
+    public UserDTO updateUserProfile(String userEmail, UserRequest userRequest) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
-        if (userRequest.getFullName() != null) {
-            user.setFullName(userRequest.getFullName());
-        }
-        if (userRequest.getGender() != null) {
-            user.setGender(GenderName.valueOf(userRequest.getGender()));
-        }
-        if (userRequest.getDateOfBirth() != null) {
-            user.setDateOfBirth(LocalDate.parse(userRequest.getDateOfBirth()));
-        }
-        if (userRequest.getAddress() != null) {
-            user.setAddress(userRequest.getAddress());
-        }
-        if (userRequest.getPhoneNumber() != null) {
-            user.setPhoneNumber(userRequest.getPhoneNumber());
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        LocalDate dateOfBirth = LocalDate.parse(userRequest.getDateOfBirth(), formatter);
+        User newUser = User.builder()
+            .fullName(userRequest.getFullName())
+            .gender(checkGender(userRequest.getGender()))
+            .dateOfBirth(dateOfBirth)
+            .address(userRequest.getAddress())
+            .phoneNumber(userRequest.getPhoneNumber())
+            .build();
+
+        User saveUser = userRepository.save(newUser);
+        return modelMapper.map(saveUser, UserDTO.class);
     }
 
     @Override
-    public UserDto updateUserById(Long userId, UserRequest userRequest) {
+    public UserDTO updateUserById(Long userId, UserRequest userRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
-        if (userRequest.getFullName() != null) {
-            user.setFullName(userRequest.getFullName());
-        }
-        if (userRequest.getGender() != null) {
-            user.setGender(GenderName.valueOf(userRequest.getGender()));
-        }
+        String hashPassword = BCrypt.hashpw(userRequest.getPassword(), BCrypt.gensalt(10));
+
         if (userRequest.getDateOfBirth() != null) {
-            user.setDateOfBirth(LocalDate.parse(userRequest.getDateOfBirth()));
-        }
-        if (userRequest.getAddress() != null) {
-            user.setAddress(userRequest.getAddress());
-        }
-        if (userRequest.getPhoneNumber() != null) {
-            user.setPhoneNumber(userRequest.getPhoneNumber());
-        }
-        if (userRequest.getRoles() != null) {
-            Set<Role> newRoles = new HashSet<Role>();
-            for (String roleName : userRequest.getRoles()) {
-                RoleName roleNameEnum = RoleName.valueOf(roleName);
-                newRoles.add(new Role(roleNameEnum));
-            }
-            user.setRoles(newRoles);
-        }
-        if (userRequest.getIsLocked() != null) {
-            user.setIsLocked(userRequest.getIsLocked());
-        }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+            LocalDate dateOfBirth = LocalDate.parse(userRequest.getDateOfBirth(), formatter);
+
+            User newUser = User.builder()
+                .fullName(userRequest.getFullName())
+                .address(userRequest.getAddress())
+                .isLocked(false)
+                .avatar(userRequest.getAvatar())
+                .password(hashPassword)
+                .email(userRequest.getEmail())
+                .phoneNumber(userRequest.getPhoneNumber())
+                .gender(checkGender(userRequest.getGender()))
+                .roles(convertRoles(userRequest.getRoles()))
+                .dateOfBirth(dateOfBirth)
+                .build();
+        }
+    
+        User newUser = User.builder()
+            .fullName(userRequest.getFullName())
+            .address(userRequest.getAddress())
+            .isLocked(false)
+            .avatar(userRequest.getAvatar())
+            .password(hashPassword)
+            .email(userRequest.getEmail())
+            .phoneNumber(userRequest.getPhoneNumber())
+            .gender(checkGender(userRequest.getGender()))
+            .roles(convertRoles(userRequest.getRoles()))
+            .build();
+
+        User saveUser = userRepository.save(newUser);
+        return modelMapper.map(saveUser, UserDTO.class);
     }
 
     @Override
-    public UserDto lockUserById(Long id) {
+    public UserDTO lockUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
         user.setIsLocked(!user.getIsLocked());
 
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        return modelMapper.map(savedUser, UserDTO.class);
     }
 
     @Override
-    public UserDto deleteUserById(Long id) {
+    public UserDTO deleteUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
+            .orElseThrow(() -> new NotFoundException("Người dùng không tìm thấy"));
 
         userRepository.delete(user);
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserDTO.class);
+    }
+
+    private GenderName checkGender(String theGenderName) {
+        for (GenderName genderName : GenderName.values()) {
+            if (genderName.name().equals(theGenderName)) {
+                return genderName;
+            }
+        }
+        return null;
+    }
+
+    private Set<Role> convertRoles(List<String> roles) {
+        Set<Role> listRole = new HashSet<>();
+        for (String role : roles) {
+            Role existingRole = roleRepository.findByName(role);
+            if (existingRole != null) {
+                listRole.add(existingRole);
+            } else {
+                throw new NotFoundException("Quyền " + role + " không tồn tại");
+            }
+        }
+        return listRole;
     }
 }

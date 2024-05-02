@@ -1,12 +1,7 @@
 package com.professionalpractice.medicalbookingbespring.dtos.response;
 
-import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.professionalpractice.medicalbookingbespring.dtos.UserDTO;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -16,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoginResponse {
 
-    UserDto user;
+    UserDTO user;
 
     String token;
 }
