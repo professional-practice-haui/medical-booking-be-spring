@@ -10,17 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
 import com.professionalpractice.medicalbookingbespring.dtos.UserDto;
 import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
+import com.professionalpractice.medicalbookingbespring.services.CloudinaryService;
 import com.professionalpractice.medicalbookingbespring.services.UserService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
 
@@ -30,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 @RestApiV1
 public class UserController {
     private final UserService userService;
+
+    private final CloudinaryService cloudinaryService;
 
     @GetMapping("/users")
     public ResponseEntity<?> getUsers(@RequestParam(defaultValue = "1") int page,
@@ -42,7 +47,6 @@ public class UserController {
         long totalPages = userPage.getTotalElements();
         List<UserDto> users = userPage.getContent();
         return CustomResponse.success(new PaginationResponse(page, limit, totalPages, users));
-
     }
 
     @PostMapping("/users")
@@ -53,8 +57,14 @@ public class UserController {
     }
 
     @PutMapping("/users/profile")
-    public ResponseEntity<?> updateProfile(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> updateProfile(@ModelAttribute UserRequest userRequest,
+            @RequestParam(value = "avatar", required = false) MultipartFile avatarFile) {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (avatarFile != null) {
+            String avatarUrl = cloudinaryService.uploadImage(avatarFile);
+            userRequest.setAvatarUrl(avatarUrl);
+        }
 
         UserDto updatedUser = userService.updateUserProfile(userEmail, userRequest);
 

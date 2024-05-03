@@ -132,6 +132,9 @@ public class UserServiceImpl implements UserService {
         if (userRequest.getPhoneNumber() != null) {
             user.setPhoneNumber(userRequest.getPhoneNumber());
         }
+        if (userRequest.getAvatarUrl() != null) {
+            user.setAvatar(userRequest.getAvatarUrl());
+        }
 
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
