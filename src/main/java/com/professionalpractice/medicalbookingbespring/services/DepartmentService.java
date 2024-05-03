@@ -1,17 +1,20 @@
 package com.professionalpractice.medicalbookingbespring.services;
 
 import com.professionalpractice.medicalbookingbespring.dtos.DepartmentDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.DepartmentRequest;
 import com.professionalpractice.medicalbookingbespring.entities.Department;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 public interface DepartmentService {
 
-    Department createDepartment(DepartmentDTO departmentDTO);
+    DepartmentDTO createDepartment(DepartmentRequest departmentRequest);
 
-    List<Department> getDepartments();
+    Page<DepartmentDTO> getDepartments(PageRequest pageRequest);
 
-    Department updateDepartment(Long departmentId, DepartmentDTO departmentDTO);
+    DepartmentDTO updateDepartment(Long departmentId, DepartmentRequest departmentRequest);
 
     void deleteDepartment(Long departmentId);
 
