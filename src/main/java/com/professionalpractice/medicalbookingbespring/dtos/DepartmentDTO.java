@@ -14,7 +14,6 @@ public class DepartmentDTO extends DateAuditingDto {
 
     Long id;
 
-    @NotBlank(message = "Yêu cầu nhập tên chuyên khoa")
     String name;
 
     String nameLeader;

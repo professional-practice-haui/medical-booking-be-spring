@@ -1,6 +1,7 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
 import com.professionalpractice.medicalbookingbespring.dtos.DoctorDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.DoctorRequest;
 import com.professionalpractice.medicalbookingbespring.entities.Department;
 import com.professionalpractice.medicalbookingbespring.entities.Doctor;
 import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
@@ -9,6 +10,9 @@ import com.professionalpractice.medicalbookingbespring.repositories.DoctorReposi
 import com.professionalpractice.medicalbookingbespring.services.DoctorService;
 import com.professionalpractice.medicalbookingbespring.utils.GenderName;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,43 +25,48 @@ public class DoctorServiceImpl implements DoctorService {
 
     private final DepartmentRepository departmentRepository;
 
+    private final ModelMapper modelMapper;
+
     @Override
-    public Doctor createDoctor(DoctorDTO doctorDTO) {
-        Department exitstingDepartment = departmentRepository.findById(doctorDTO.getDepartmentId())
+    public DoctorDTO createDoctor(DoctorRequest doctorRequest) {
+        Department exitstingDepartment = departmentRepository.findById(doctorRequest.getDepartmentId())
             .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này"));
 
         Doctor doctor = Doctor.builder()
-            .name(doctorDTO.getName())
-            .gender(checkGender(doctorDTO.getGender()))
-            .degree(doctorDTO.getDegree())
-            .experience(doctorDTO.getExperience())
-            .avatar(doctorDTO.getAvatar())
-            .description(doctorDTO.getDescription())
+            .name(doctorRequest.getName())
+            .gender(checkGender(doctorRequest.getGender()))
+            .degree(doctorRequest.getDegree())
+            .experience(doctorRequest.getExperience())
+            .avatar(doctorRequest.getAvatar())
+            .description(doctorRequest.getDescription())
             .department(exitstingDepartment)
             .build();
-        return doctorRepository.save(doctor);
+        Doctor saveDoctor = doctorRepository.save(doctor);
+        return modelMapper.map(saveDoctor,DoctorDTO.class);
     }
 
 
     @Override
-    public List<Doctor> getDoctors() {
-        return doctorRepository.findAll();
+    public Page<DoctorDTO> getDoctors(PageRequest pageRequest) {
+        Page<Doctor> doctorPage = doctorRepository.queryDoctors(pageRequest);
+        return doctorPage.map(doctor -> modelMapper.map(doctor,DoctorDTO.class));
     }
 
     @Override
-    public Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
+    public DoctorDTO updateDoctor(Long doctorId, DoctorRequest doctorRequest) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này!"));
-        Department department = departmentRepository.findById(doctorDTO.getDepartmentId())
+        Department department = departmentRepository.findById(doctorRequest.getDepartmentId())
             .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này!"));
-        doctor.setName(doctorDTO.getName());
+        doctor.setName(doctorRequest.getName());
         doctor.setDepartment(department);
-        doctor.setAvatar(doctorDTO.getAvatar());
-        doctor.setDegree(doctorDTO.getDegree());
-        doctor.setExperience(doctorDTO.getExperience());
-        doctor.setGender(checkGender(doctorDTO.getGender()));
-        doctor.setDescription(doctorDTO.getDescription());
-        return doctorRepository.save(doctor);
+        doctor.setAvatar(doctorRequest.getAvatar());
+        doctor.setDegree(doctorRequest.getDegree());
+        doctor.setExperience(doctorRequest.getExperience());
+        doctor.setGender(checkGender(doctorRequest.getGender()));
+        doctor.setDescription(doctorRequest.getDescription());
+        Doctor saveDoctor = doctorRepository.save(doctor);
+        return modelMapper.map(saveDoctor,DoctorDTO.class);
     }
 
     @Override

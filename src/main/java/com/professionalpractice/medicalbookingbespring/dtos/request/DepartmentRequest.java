@@ -10,23 +10,14 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DoctorRequest {
+public class DepartmentRequest {
 
     Long id;
 
-    @NotBlank(message = "Yêu cầu nhập tên bác sĩ")
+    @NotBlank(message = "Yêu cầu nhập tên chuyên khoa")
     String name;
 
-    String gender;
-
-    String degree;
-
-    int experience;
-
-    String avatar;
+    String nameLeader;
 
     String description;
-
-    @NotBlank(message = "Yêu cầu nhập mã chuyên khoa")
-    Long departmentId;
 }

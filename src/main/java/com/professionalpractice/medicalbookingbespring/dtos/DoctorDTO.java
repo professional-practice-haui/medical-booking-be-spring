@@ -14,7 +14,6 @@ public class DoctorDTO extends DateAuditingDto {
 
     Long id;
 
-    @NotBlank(message = "Yêu cầu nhập tên bác sĩ")
     String name;
 
     String gender;
@@ -27,6 +26,5 @@ public class DoctorDTO extends DateAuditingDto {
 
     String description;
 
-    @NotBlank(message = "Yêu cầu nhập mã chuyên khoa")
     Long departmentId;
 }
