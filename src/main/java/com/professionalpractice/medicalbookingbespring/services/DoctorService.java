@@ -1,17 +1,20 @@
 package com.professionalpractice.medicalbookingbespring.services;
 
 import com.professionalpractice.medicalbookingbespring.dtos.DoctorDTO;
+import com.professionalpractice.medicalbookingbespring.dtos.request.DoctorRequest;
 import com.professionalpractice.medicalbookingbespring.entities.Doctor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 public interface DoctorService {
 
-    Doctor createDoctor(DoctorDTO doctorDTO);
+    DoctorDTO createDoctor(DoctorRequest doctorRequest);
 
-    List<Doctor> getDoctors();
+    Page<DoctorDTO> getDoctors(PageRequest pageRequest);
 
-    Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO);
+    DoctorDTO updateDoctor(Long doctorId, DoctorRequest doctorRequest);
 
     void deleteDoctor(Long doctorId);
 }
