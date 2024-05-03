@@ -30,6 +30,8 @@ public class UserRequest {
 
     String password;
 
+    String avatarUrl;
+
     Boolean isLocked;
 
     List<String> roles;
