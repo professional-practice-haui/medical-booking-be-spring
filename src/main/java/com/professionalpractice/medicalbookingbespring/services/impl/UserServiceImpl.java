@@ -81,11 +81,15 @@ public class UserServiceImpl implements UserService {
         }
 
         newUser.setRoles(new HashSet<>());
-        newUser.getRoles().add(new Role(RoleName.USER));
         if (userRequest.getRoles() != null) {
             for (String roleName : userRequest.getRoles()) {
                 newUser.getRoles().add(new Role(RoleName.valueOf(roleName)));
             }
+        }
+
+        boolean hasUserRole = newUser.getRoles().stream().anyMatch(role -> role.getRoleName().equals("USER"));
+        if (!hasUserRole) {
+            newUser.getRoles().add(new Role(RoleName.USER));
         }
 
         newUser.setIsLocked(false);
