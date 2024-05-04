@@ -1,5 +1,7 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
+import com.professionalpractice.medicalbookingbespring.entities.Shift;
+import com.professionalpractice.medicalbookingbespring.repositories.ShiftRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +18,10 @@ import com.professionalpractice.medicalbookingbespring.services.DoctorService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class DoctorServiceImpl implements DoctorService {
@@ -24,13 +30,13 @@ public class DoctorServiceImpl implements DoctorService {
 
     private final DepartmentRepository departmentRepository;
 
+    private final ShiftRepository shiftRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public DoctorDTO createDoctor(DoctorRequest doctorRequest) {
         Department existingDepartment = departmentRepository.findById(doctorRequest.getDepartment())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này"));
-
         String imageUrl = doctorRequest.getImageUrl();
         if (imageUrl == null || imageUrl.isEmpty()) {
             imageUrl = "https://cdn-icons-png.flaticon.com/512/3774/3774299.png";
@@ -43,6 +49,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .image(imageUrl)
                 .description(doctorRequest.getDescription())
                 .department(existingDepartment)
+                .shifts(convertShifts(doctorRequest.getShifts()))
                 .build();
 
         Doctor saveDoctor = doctorRepository.save(doctor);
@@ -81,5 +88,14 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void deleteDoctor(Long doctorId) {
         doctorRepository.deleteById(doctorId);
+    }
+
+    private Set<Shift> convertShifts(List<Long> shifts) {
+        Set<Shift> listShift = new HashSet<>();
+        for(Long shift : shifts) {
+            listShift.add(shiftRepository.findById(shift)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc")));
+        }
+        return listShift;
     }
 }
