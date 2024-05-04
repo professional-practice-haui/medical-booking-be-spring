@@ -2,7 +2,6 @@ package com.professionalpractice.medicalbookingbespring.security;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
 
 import java.util.Arrays;
 
@@ -35,12 +34,11 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(apiConfigurationSource()))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(GET, "/api/v1/doctors", "/api/v1/departments").permitAll()
                         .requestMatchers(POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
-                        .requestMatchers(GET, "/api/v1/auth/token").hasRole("USER")
                         .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
-                        .requestMatchers(PUT, "/api/v1/users/profile").hasRole("USER")
-                        .requestMatchers("/api/v1/departments", "/api/v1/doctors").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/departments/**", "/api/v1/doctors/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         return http.build();

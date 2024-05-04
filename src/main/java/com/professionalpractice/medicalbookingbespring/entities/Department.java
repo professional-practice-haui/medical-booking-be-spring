@@ -1,8 +1,19 @@
 package com.professionalpractice.medicalbookingbespring.entities;
 
 import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
-import jakarta.persistence.*;
-import lombok.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -27,5 +38,7 @@ public class Department extends DateAuditing {
 
     @Column(name = "description")
     String description;
+
+    String image;
 
 }
