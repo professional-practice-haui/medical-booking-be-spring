@@ -1,8 +1,22 @@
 package com.professionalpractice.medicalbookingbespring.entities;
 
-import com.professionalpractice.medicalbookingbespring.utils.GenderName;
-import jakarta.persistence.*;
-import lombok.*;
+import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -13,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Doctor {
+public class Doctor extends DateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,22 +36,15 @@ public class Doctor {
     @Column(name = "name", nullable = false)
     String name;
 
-    @Enumerated(EnumType.STRING)
-    GenderName gender;
-
-    @Column(name = "degree")
     String degree;
 
-    @Column(name = "experience")
     int experience;
 
-    @Column(name = "avatar")
-    String avatar;
+    String image;
 
-    @Column(name = "description")
     String description;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "department_id")
     Department department;
 

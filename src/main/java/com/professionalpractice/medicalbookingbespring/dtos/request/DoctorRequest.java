@@ -1,9 +1,11 @@
 package com.professionalpractice.medicalbookingbespring.dtos.request;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
 
 @Getter
 @Setter
@@ -14,7 +16,6 @@ public class DoctorRequest {
 
     Long id;
 
-    @NotBlank(message = "Yêu cầu nhập tên bác sĩ")
     String name;
 
     String gender;
@@ -23,10 +24,9 @@ public class DoctorRequest {
 
     int experience;
 
-    String avatar;
+    String imageUrl;
 
     String description;
 
-    @NotBlank(message = "Yêu cầu nhập mã chuyên khoa")
-    Long departmentId;
+    Long department;
 }

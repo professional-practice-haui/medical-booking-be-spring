@@ -2,18 +2,26 @@ package com.professionalpractice.medicalbookingbespring.controllers;
 
 import java.util.List;
 
-import com.professionalpractice.medicalbookingbespring.dtos.request.DoctorRequest;
-import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
 import com.professionalpractice.medicalbookingbespring.dtos.DoctorDTO;
-import com.professionalpractice.medicalbookingbespring.entities.Doctor;
+import com.professionalpractice.medicalbookingbespring.dtos.request.DoctorRequest;
+import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
+import com.professionalpractice.medicalbookingbespring.entities.common.DateAuditing;
+import com.professionalpractice.medicalbookingbespring.services.CloudinaryService;
 import com.professionalpractice.medicalbookingbespring.services.DoctorService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
 
@@ -21,22 +29,31 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestApiV1
-public class DoctorController {
+public class DoctorController extends DateAuditing {
 
     private final DoctorService doctorService;
 
+    private final CloudinaryService cloudinaryService;
+
     @PostMapping("/doctors")
-    public ResponseEntity<?> createDoctor(@RequestBody DoctorRequest doctorRequest) {
+    public ResponseEntity<?> createDoctor(@ModelAttribute DoctorRequest doctorRequest,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+
+        if (imageFile != null) {
+            String imageUrl = cloudinaryService.uploadImage(imageFile);
+            doctorRequest.setImageUrl(imageUrl);
+        }
+
         DoctorDTO doctor = doctorService.createDoctor(doctorRequest);
-        return CustomResponse.success(HttpStatus.CREATED,"Tạo bác sĩ mới thành công",doctor);
+        return CustomResponse.success(HttpStatus.CREATED, "Tạo bác sĩ mới thành công", doctor);
     }
 
     @GetMapping("/doctors")
-    public ResponseEntity<?> getDoctors(@RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int limit) {
+    public ResponseEntity<?> getDoctors(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
         PageRequest pageRequest = PageRequest.of(
-            page, limit,
-            Sort.by("id").ascending());
+                page - 1, limit,
+                Sort.by("id").ascending());
         Page<DoctorDTO> doctorPage = doctorService.getDoctors(pageRequest);
         long totalPages = doctorPage.getTotalElements();
         List<DoctorDTO> doctors = doctorPage.getContent();
@@ -45,9 +62,16 @@ public class DoctorController {
 
     @PutMapping("/doctors/{doctorId}")
     public ResponseEntity<?> updateDepartment(@PathVariable Long doctorId,
-            @RequestBody DoctorRequest doctorRequest) {
+            @ModelAttribute DoctorRequest doctorRequest,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+
+        if (imageFile != null) {
+            String imageUrl = cloudinaryService.uploadImage(imageFile);
+            doctorRequest.setImageUrl(imageUrl);
+        }
+
         DoctorDTO doctor = doctorService.updateDoctor(doctorId, doctorRequest);
-        return CustomResponse.success("Cập nhật thành công",doctor);
+        return CustomResponse.success("Cập nhật thành công", doctor);
     }
 
     @DeleteMapping("/doctors/{doctorId}")

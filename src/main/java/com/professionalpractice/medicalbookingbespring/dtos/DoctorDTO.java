@@ -1,8 +1,13 @@
 package com.professionalpractice.medicalbookingbespring.dtos;
 
 import com.professionalpractice.medicalbookingbespring.dtos.common.DateAuditingDto;
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import com.professionalpractice.medicalbookingbespring.entities.Department;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -16,15 +21,13 @@ public class DoctorDTO extends DateAuditingDto {
 
     String name;
 
-    String gender;
-
     String degree;
 
     int experience;
 
-    String avatar;
+    String image;
 
     String description;
 
-    Long departmentId;
+    Department department;
 }
