@@ -1,29 +1,30 @@
 package com.professionalpractice.medicalbookingbespring.security;
 
-import com.professionalpractice.medicalbookingbespring.entities.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.professionalpractice.medicalbookingbespring.entities.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
     private User user;
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> roles = new ArrayList<>();
         user.getRoles().forEach(role -> roles.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
         return roles;
     }
-
 
     @Override
     public String getPassword() {
@@ -46,7 +47,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
 
-        return true;
+        return !user.getIsLocked();
     }
 
     @Override
