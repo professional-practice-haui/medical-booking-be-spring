@@ -47,6 +47,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             if (email != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+                if (!userDetails.isAccountNonLocked()) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Tài khoản của bạn đã bị khóa");
+                }
+
                 if (jwtTokenUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,

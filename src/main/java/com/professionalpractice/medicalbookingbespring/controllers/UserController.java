@@ -46,6 +46,7 @@ public class UserController {
 
         long totalPages = userPage.getTotalElements();
         List<UserDto> users = userPage.getContent();
+
         return CustomResponse.success(new PaginationResponse(page, limit, totalPages, users));
     }
 
