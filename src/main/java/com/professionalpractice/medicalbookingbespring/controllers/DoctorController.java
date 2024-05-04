@@ -7,13 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
@@ -36,7 +30,7 @@ public class DoctorController extends DateAuditing {
     private final CloudinaryService cloudinaryService;
 
     @PostMapping("/doctors")
-    public ResponseEntity<?> createDoctor(@ModelAttribute DoctorRequest doctorRequest,
+    public ResponseEntity<?> createDoctor(@RequestBody DoctorRequest doctorRequest,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
         if (imageFile != null) {
@@ -61,8 +55,8 @@ public class DoctorController extends DateAuditing {
     }
 
     @PutMapping("/doctors/{doctorId}")
-    public ResponseEntity<?> updateDepartment(@PathVariable Long doctorId,
-            @ModelAttribute DoctorRequest doctorRequest,
+    public ResponseEntity<?> updateDoctor(@PathVariable Long doctorId,
+            @RequestBody DoctorRequest doctorRequest,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
         if (imageFile != null) {
