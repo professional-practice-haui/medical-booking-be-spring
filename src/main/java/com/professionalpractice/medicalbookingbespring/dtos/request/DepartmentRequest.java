@@ -1,5 +1,6 @@
 package com.professionalpractice.medicalbookingbespring.dtos.request;
 
+import com.professionalpractice.medicalbookingbespring.dtos.common.DateAuditingDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DepartmentRequest {
+public class DepartmentRequest extends DateAuditingDto {
 
     Long id;
 

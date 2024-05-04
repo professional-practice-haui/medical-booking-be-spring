@@ -38,6 +38,10 @@ public class WebSecurityConfig {
                         .requestMatchers(POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
                         .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
+                        .requestMatchers(POST, "/api/v1/shifts").hasRole("ADMIN")
+                        .requestMatchers(GET, "/api/v1/shifts").hasRole("ADMIN")
+                        .requestMatchers(POST, "/api/v1/healthForms").hasRole("USER")
+                        .requestMatchers(GET, "/api/v1/healthForms/**").hasRole("USER")
                         .requestMatchers("/api/v1/departments/**", "/api/v1/doctors/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
