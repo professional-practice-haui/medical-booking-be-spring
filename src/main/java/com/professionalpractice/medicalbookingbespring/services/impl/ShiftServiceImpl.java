@@ -1,10 +1,14 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
-import com.professionalpractice.medicalbookingbespring.dtos.DepartmentDTO;
+import java.time.LocalDate;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
 import com.professionalpractice.medicalbookingbespring.dtos.ShiftDTO;
-import com.professionalpractice.medicalbookingbespring.dtos.request.DoctorRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.request.ShiftRequest;
-import com.professionalpractice.medicalbookingbespring.entities.Department;
 import com.professionalpractice.medicalbookingbespring.entities.Doctor;
 import com.professionalpractice.medicalbookingbespring.entities.Shift;
 import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
@@ -12,17 +16,8 @@ import com.professionalpractice.medicalbookingbespring.repositories.DoctorReposi
 import com.professionalpractice.medicalbookingbespring.repositories.HealthFormRepository;
 import com.professionalpractice.medicalbookingbespring.repositories.ShiftRepository;
 import com.professionalpractice.medicalbookingbespring.services.ShiftService;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -39,23 +34,15 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     public ShiftDTO createShift(ShiftRequest shiftRequest) {
         Doctor existingDoctor;
-        if(shiftRequest.getDoctor() != null) {
+        if (shiftRequest.getDoctor() != null) {
             existingDoctor = doctorRepository.findById(shiftRequest.getDoctor())
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này"));
-        }
-        else{
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này"));
+        } else {
             existingDoctor = null;
         }
-        LocalDate date;
-        if(shiftRequest.getDate() != null){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            date = LocalDate.parse(shiftRequest.getDate(), formatter);
-        }
-        else {
-            date = null;
-        }
+        LocalDate date = LocalDate.parse(shiftRequest.getDate());
 
-            Shift shift = Shift.builder()
+        Shift shift = Shift.builder()
                 .date(date)
                 .time(shiftRequest.getTime())
                 .place(shiftRequest.getPlace())
@@ -85,33 +72,25 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     public ShiftDTO updateShift(Long shiftId, ShiftRequest shiftRequest) {
         Shift shift = shiftRepository.findById(shiftId)
-            .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc này"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc này"));
         Doctor existingDoctor;
-        if(shiftRequest.getDoctor() != null) {
+        if (shiftRequest.getDoctor() != null) {
             existingDoctor = doctorRepository.findById(shiftRequest.getDoctor())
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này"));
-        }
-        else{
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này"));
+        } else {
             existingDoctor = null;
         }
-        LocalDate date;
-        if(shiftRequest.getDate() != null){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            date = LocalDate.parse(shiftRequest.getDate(), formatter);
-        }
-        else {
-            date = null;
-        }
+        LocalDate date = LocalDate.parse(shiftRequest.getDate());
 
         Shift newShift = Shift.builder()
-            .id(shiftId)
-            .date(date)
-            .time(shiftRequest.getTime())
-            .place(shiftRequest.getPlace())
-            .maxSlot(shiftRequest.getMaxSlot())
-            .doctor(existingDoctor)
-            .note(shiftRequest.getNote())
-            .build();
+                .id(shiftId)
+                .date(date)
+                .time(shiftRequest.getTime())
+                .place(shiftRequest.getPlace())
+                .maxSlot(shiftRequest.getMaxSlot())
+                .doctor(existingDoctor)
+                .note(shiftRequest.getNote())
+                .build();
 
         Shift saveShift = shiftRepository.save(newShift);
         return modelMapper.map(saveShift, ShiftDTO.class);
@@ -121,6 +100,5 @@ public class ShiftServiceImpl implements ShiftService {
     public void deleteShiftById(Long shiftId) {
         shiftRepository.deleteById(shiftId);
     }
-
 
 }
