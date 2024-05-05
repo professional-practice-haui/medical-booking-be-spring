@@ -30,7 +30,7 @@ public class DoctorController extends DateAuditing {
     private final CloudinaryService cloudinaryService;
 
     @PostMapping("/doctors")
-    public ResponseEntity<?> createDoctor(@RequestBody DoctorRequest doctorRequest,
+    public ResponseEntity<?> createDoctor(@ModelAttribute DoctorRequest doctorRequest,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
         if (imageFile != null) {
@@ -56,7 +56,7 @@ public class DoctorController extends DateAuditing {
 
     @PutMapping("/doctors/{doctorId}")
     public ResponseEntity<?> updateDoctor(@PathVariable Long doctorId,
-            @RequestBody DoctorRequest doctorRequest,
+            @ModelAttribute DoctorRequest doctorRequest,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
         if (imageFile != null) {
