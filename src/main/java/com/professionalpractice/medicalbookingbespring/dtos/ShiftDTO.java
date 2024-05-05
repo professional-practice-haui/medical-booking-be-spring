@@ -1,5 +1,6 @@
 package com.professionalpractice.medicalbookingbespring.dtos;
 
+import com.professionalpractice.medicalbookingbespring.entities.Doctor;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,4 +27,10 @@ public class ShiftDTO {
     String place;
 
     int maxSlot;
+
+    int slot;
+
+    Doctor doctor;
+
+    String note;
 }

@@ -24,4 +24,8 @@ public class ShiftRequest {
     String place;
 
     int maxSlot;
+
+    Long doctor;
+
+    String note;
 }

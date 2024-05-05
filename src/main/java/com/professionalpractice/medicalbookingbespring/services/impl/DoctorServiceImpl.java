@@ -35,8 +35,15 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public DoctorDTO createDoctor(DoctorRequest doctorRequest) {
-        Department existingDepartment = departmentRepository.findById(doctorRequest.getDepartment())
+        Department existingDepartment;
+        if(doctorRequest.getDepartment() != null) {
+            existingDepartment = departmentRepository.findById(doctorRequest.getDepartment())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này"));
+        }
+        else{
+            existingDepartment = null;
+        }
+
         String imageUrl = doctorRequest.getImageUrl();
         if (imageUrl == null || imageUrl.isEmpty()) {
             imageUrl = "https://cdn-icons-png.flaticon.com/512/3774/3774299.png";
@@ -49,7 +56,6 @@ public class DoctorServiceImpl implements DoctorService {
                 .image(imageUrl)
                 .description(doctorRequest.getDescription())
                 .department(existingDepartment)
-                .shifts(convertShifts(doctorRequest.getShifts()))
                 .build();
 
         Doctor saveDoctor = doctorRepository.save(doctor);
@@ -64,24 +70,33 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public DoctorDTO updateDoctor(Long doctorId, DoctorRequest doctorRequest) {
+        Department existingDepartment;
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bác sĩ này!"));
-        Department department = departmentRepository.findById(doctorRequest.getDepartment())
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này!"));
+        if(doctorRequest.getDepartment() != null) {
+            existingDepartment = departmentRepository.findById(doctorRequest.getDepartment())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy chuyên khoa này"));
+        }
+        else{
+            existingDepartment = null;
+        }
 
         String imageUrl = doctorRequest.getImageUrl();
         if (imageUrl == null || imageUrl.isEmpty()) {
             imageUrl = doctor.getImage();
         }
 
-        doctor.setName(doctorRequest.getName());
-        doctor.setDepartment(department);
-        doctor.setImage(imageUrl);
-        doctor.setDegree(doctorRequest.getDegree());
-        doctor.setExperience(doctorRequest.getExperience());
-        doctor.setDescription(doctorRequest.getDescription());
+        Doctor newDoctor = Doctor.builder()
+            .id(doctorId)
+            .name(doctorRequest.getName())
+            .degree(doctorRequest.getDegree())
+            .experience(doctorRequest.getExperience())
+            .image(imageUrl)
+            .description(doctorRequest.getDescription())
+            .department(existingDepartment)
+            .build();
 
-        Doctor saveDoctor = doctorRepository.save(doctor);
+        Doctor saveDoctor = doctorRepository.save(newDoctor);
         return modelMapper.map(saveDoctor, DoctorDTO.class);
     }
 
@@ -92,10 +107,17 @@ public class DoctorServiceImpl implements DoctorService {
 
     private Set<Shift> convertShifts(List<Long> shifts) {
         Set<Shift> listShift = new HashSet<>();
-        for(Long shift : shifts) {
-            listShift.add(shiftRepository.findById(shift)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc")));
+        if(shifts != null) {
+            for(Long shift : shifts) {
+                listShift.add(shiftRepository.findById(shift)
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc")));
+            }
         }
+        else {
+            listShift = null;
+        }
+
+
         return listShift;
     }
 }
