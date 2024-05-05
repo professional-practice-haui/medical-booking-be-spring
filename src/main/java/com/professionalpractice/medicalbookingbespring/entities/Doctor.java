@@ -43,10 +43,4 @@ public class Doctor extends DateAuditing {
     @JoinColumn(name = "department_id")
     Department department;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "doctors_shifts",
-        joinColumns = @JoinColumn(name = "doctor_id"),
-        inverseJoinColumns = @JoinColumn(name = "shift_id"))
-    Set<Shift> shifts;
-
 }

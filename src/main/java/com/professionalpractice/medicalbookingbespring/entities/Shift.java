@@ -34,4 +34,9 @@ public class Shift {
     @Column(name = "maxSlot")
     int maxSlot;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "doctor_id")
+    Doctor doctor;
+
+    String note;
 }

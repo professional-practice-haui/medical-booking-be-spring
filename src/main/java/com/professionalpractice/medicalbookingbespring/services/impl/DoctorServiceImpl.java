@@ -56,7 +56,6 @@ public class DoctorServiceImpl implements DoctorService {
                 .image(imageUrl)
                 .description(doctorRequest.getDescription())
                 .department(existingDepartment)
-                .shifts(convertShifts(doctorRequest.getShifts()))
                 .build();
 
         Doctor saveDoctor = doctorRepository.save(doctor);
@@ -95,7 +94,6 @@ public class DoctorServiceImpl implements DoctorService {
             .image(imageUrl)
             .description(doctorRequest.getDescription())
             .department(existingDepartment)
-            .shifts(convertShifts(doctorRequest.getShifts()))
             .build();
 
         Doctor saveDoctor = doctorRepository.save(newDoctor);
