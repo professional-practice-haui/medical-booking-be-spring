@@ -26,4 +26,6 @@ public class ShiftDTO {
     String place;
 
     int maxSlot;
+
+    int slot;
 }
