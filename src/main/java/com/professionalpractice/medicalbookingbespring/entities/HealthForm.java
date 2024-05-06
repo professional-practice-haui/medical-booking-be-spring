@@ -46,4 +46,6 @@ public class HealthForm {
 
     @Column(name = "deniedReason")
     String deniedReason;
+
+    int status;
 }

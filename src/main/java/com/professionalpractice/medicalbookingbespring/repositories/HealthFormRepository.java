@@ -17,5 +17,7 @@ public interface HealthFormRepository extends JpaRepository<HealthForm, Long>{
     @Query("SELECT u FROM HealthForm u WHERE u.user.id = ?1")
     Page<HealthForm> queryHealthForm(Long id, Pageable pageable);
 
+    @Query("SELECT u FROM HealthForm u WHERE u.status = ?1")
+    Page<HealthForm> queryHealthFormByStatus(String status, Pageable pageable);
     int countByShiftId(Long shiftId);
 }
