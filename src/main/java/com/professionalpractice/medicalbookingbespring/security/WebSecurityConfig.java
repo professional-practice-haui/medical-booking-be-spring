@@ -34,15 +34,15 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(apiConfigurationSource()))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(GET, "/api/v1/doctors", "/api/v1/departments","/api/v1/shifts").permitAll()
+                        .requestMatchers(GET, "/api/v1/doctors", "/api/v1/departments", "/api/v1/shifts").permitAll()
                         .requestMatchers(POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
                         .requestMatchers(GET, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(POST, "/api/v1/users").hasRole("ADMIN")
-                        .requestMatchers(POST, "/api/v1/shifts").hasRole("ADMIN")
-                        .requestMatchers(GET, "/api/v1/shifts").hasRole("ADMIN")
-                        .requestMatchers(POST, "/api/v1/healthForms").hasRole("USER")
-                        .requestMatchers(GET, "/api/v1/healthForms/**").hasRole("USER")
-                        .requestMatchers("/api/v1/departments/**", "/api/v1/doctors/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/v1/departments/**",
+                                "/api/v1/doctors/**",
+                                "/api/v1/shifts/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         return http.build();

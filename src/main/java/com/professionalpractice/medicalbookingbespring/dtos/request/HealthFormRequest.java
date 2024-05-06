@@ -1,9 +1,10 @@
 package com.professionalpractice.medicalbookingbespring.dtos.request;
 
-import com.professionalpractice.medicalbookingbespring.entities.Shift;
-import com.professionalpractice.medicalbookingbespring.entities.User;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -25,9 +26,9 @@ public class HealthFormRequest {
 
     String reason;
 
-    String cccd;
+    String cccdUrl;
 
-    String bhyt;
+    String bhytUrl;
 
     String deniedReason;
 }
