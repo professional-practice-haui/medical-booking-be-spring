@@ -7,18 +7,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
 import com.professionalpractice.medicalbookingbespring.dtos.HealthFormDTO;
 import com.professionalpractice.medicalbookingbespring.dtos.request.HealthFormRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
+import com.professionalpractice.medicalbookingbespring.services.CloudinaryService;
 import com.professionalpractice.medicalbookingbespring.services.HealthFormService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
 
@@ -30,10 +34,23 @@ public class HealthFormController {
 
     private final HealthFormService healthFormService;
 
+    private final CloudinaryService cloudinaryService;
+
     @PostMapping("/health-forms")
-    public ResponseEntity<?> createHealthForms(@RequestBody HealthFormRequest healthFormRequest) {
+    public ResponseEntity<?> createHealthForms(
+            @ModelAttribute HealthFormRequest healthFormRequest,
+            @RequestParam(value = "cccd") MultipartFile cccdFile,
+            @RequestParam(value = "bhyt", required = false) MultipartFile bhytFile) {
+
+        String ccdUrl = cloudinaryService.uploadImage(cccdFile);
+        healthFormRequest.setCccdUrl(ccdUrl);
+        if (bhytFile != null) {
+            String bhytUrl = cloudinaryService.uploadImage(bhytFile);
+            healthFormRequest.setBhytUrl(bhytUrl);
+        }
+
         HealthFormDTO healthForm = healthFormService.createHealthForm(healthFormRequest);
-        return CustomResponse.success(HttpStatus.CREATED, "Tạo ca làm việc thành công", healthForm);
+        return CustomResponse.success(HttpStatus.CREATED, "Toạ đơn khám thành công", healthForm);
     }
 
     @GetMapping("/health-forms")
@@ -48,16 +65,20 @@ public class HealthFormController {
         return CustomResponse.success(new PaginationResponse(page, limit, totalPages, healthForms));
     }
 
-    @GetMapping("/health-forms/{userId}")
+    @GetMapping("/health-forms/history")
     public ResponseEntity<?> getHealthFormsByUserId(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int limit,
-            @PathVariable Long userId) {
+            @RequestParam(defaultValue = "10") int limit) {
         PageRequest pageRequest = PageRequest.of(
                 page - 1, limit,
                 Sort.by("id").ascending());
-        Page<HealthFormDTO> healthFormPage = healthFormService.getHealthFormByUserId(userId, pageRequest);
+
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Page<HealthFormDTO> healthFormPage = healthFormService.getHistory(userEmail, pageRequest);
+
         long totalPages = healthFormPage.getTotalElements();
         List<HealthFormDTO> healthForms = healthFormPage.getContent();
+
         return CustomResponse.success(new PaginationResponse(page, limit, totalPages, healthForms));
     }
 
