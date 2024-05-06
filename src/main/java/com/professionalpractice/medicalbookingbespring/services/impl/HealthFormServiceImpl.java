@@ -49,6 +49,7 @@ public class HealthFormServiceImpl implements HealthFormService {
                                 .cccd(healthFormRequest.getCccdUrl())
                                 .bhyt(healthFormRequest.getBhytUrl())
                                 .deniedReason(healthFormRequest.getDeniedReason())
+                                .status(0)
                                 .build();
 
                 HealthForm saveHealthForm = healthFormRepository.save(healthForm);
@@ -72,26 +73,16 @@ public class HealthFormServiceImpl implements HealthFormService {
         public HealthFormDTO updateHealthForm(Long healthFormId, HealthFormRequest healthFormRequest) {
                 HealthForm healthForm = healthFormRepository.findById(healthFormId)
                                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn khám"));
-                String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-                User user = userRepository.findByEmail(userEmail)
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
-                Shift shift = shiftRepository.findById(healthFormRequest.getShift())
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc này này"));
 
-                HealthForm newHealthForm = HealthForm.builder()
-                                .id(healthFormId)
-                                .user(user)
-                                .namePatient(healthFormRequest.getNamePatient())
-                                .email(healthFormRequest.getEmail())
-                                .phoneNumber(healthFormRequest.getPhoneNumber())
-                                .shift(shift)
-                                .reason(healthFormRequest.getReason())
-                                .cccd(healthFormRequest.getCccdUrl())
-                                .bhyt(healthFormRequest.getBhytUrl())
-                                .deniedReason(healthFormRequest.getDeniedReason())
-                                .build();
+                if (healthFormRequest.getStatus() != 0) {
+                        healthForm.setStatus(healthFormRequest.getStatus());
+                }
 
-                HealthForm saveHealthForm = healthFormRepository.save(newHealthForm);
+                if (healthFormRequest.getDeniedReason() != null) {
+                        healthForm.setDeniedReason(healthFormRequest.getDeniedReason());
+                }
+
+                HealthForm saveHealthForm = healthFormRepository.save(healthForm);
                 return modelMapper.map(saveHealthForm, HealthFormDTO.class);
         }
 
@@ -107,6 +98,14 @@ public class HealthFormServiceImpl implements HealthFormService {
                 User user = userRepository.findByEmail(userEmail)
                                 .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
                 Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(user.getId(), pageRequest);
+
+                return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
+        }
+
+
+        @Override
+        public Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest) {
+                Page<HealthForm> healthFormPage = healthFormRepository.queryHealthFormByStatus(status, pageRequest);
 
                 return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
         }

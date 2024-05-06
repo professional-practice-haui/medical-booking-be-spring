@@ -32,4 +32,6 @@ public class HealthFormDTO {
     String bhyt;
 
     String deniedReason;
+
+    int status;
 }
