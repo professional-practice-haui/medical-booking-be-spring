@@ -19,4 +19,6 @@ public interface HealthFormService {
     void deleteHealthFormById(Long healthFormId);
 
     Page<HealthFormDTO> getHistory(String userEmail, PageRequest pageRequest);
+
+    Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest);
 }

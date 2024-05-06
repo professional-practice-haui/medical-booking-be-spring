@@ -31,4 +31,6 @@ public class HealthFormRequest {
     String bhytUrl;
 
     String deniedReason;
+
+    int status;
 }
