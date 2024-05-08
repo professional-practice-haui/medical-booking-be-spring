@@ -18,6 +18,6 @@ public interface HealthFormRepository extends JpaRepository<HealthForm, Long>{
     Page<HealthForm> queryHealthForm(Long id, Pageable pageable);
 
     @Query("SELECT u FROM HealthForm u WHERE u.status = ?1")
-    Page<HealthForm> queryHealthFormByStatus(String status, Pageable pageable);
+    Page<HealthForm> queryHealthFormByStatus(Integer status, Pageable pageable);
     int countByShiftId(Long shiftId);
 }

@@ -59,15 +59,23 @@ public class HealthFormController {
 
     @GetMapping("/health-forms")
     public ResponseEntity<?> getHealthForms(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+                                            @RequestParam(defaultValue = "10") int limit,
+                                            @RequestParam(required = false) Integer status) {
         PageRequest pageRequest = PageRequest.of(
                 page - 1, limit,
                 Sort.by("id").ascending());
-        Page<HealthFormDTO> healthFormPage = healthFormService.getHealthForms(pageRequest);
+        Page<HealthFormDTO> healthFormPage;
+        if(status != null) {
+            healthFormPage = healthFormService.getHealthFormByStatus(status ,pageRequest);
+        } else {
+            healthFormPage = healthFormService.getHealthForms(pageRequest);
+        }
+
         long totalPages = healthFormPage.getTotalElements();
         List<HealthFormDTO> healthForms = healthFormPage.getContent();
         return CustomResponse.success(new PaginationResponse(page, limit, totalPages, healthForms));
     }
+
 
     @GetMapping("/health-forms/history")
     public ResponseEntity<?> getHealthFormsByUserId(@RequestParam(defaultValue = "1") int page,

@@ -43,6 +43,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDto> getUsersByIsLocked(Boolean status, PageRequest pageRequest) {
+        Page<User> usersPage = userRepository.queryByIsLocked(status, pageRequest);
+        return usersPage.map(user -> modelMapper.map(user, UserDto.class));
+    }
+
+    @Override
     public UserDto createUser(UserRequest userRequest) {
         Optional<User> user = userRepository.findByEmail(userRequest.getEmail());
         if (user.isPresent()) {

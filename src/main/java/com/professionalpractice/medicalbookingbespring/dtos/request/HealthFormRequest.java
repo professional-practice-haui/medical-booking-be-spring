@@ -34,5 +34,5 @@ public class HealthFormRequest {
 
     String deniedReason;
 
-    int status;
+    Integer status;
 }

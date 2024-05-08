@@ -1,7 +1,6 @@
 package com.professionalpractice.medicalbookingbespring.dtos;
 
 import com.professionalpractice.medicalbookingbespring.entities.Shift;
-import com.professionalpractice.medicalbookingbespring.entities.User;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ public class HealthFormDTO {
 
     Long id;
 
-    User user;
+    UserDto user;
 
     String namePatient;
 
@@ -39,5 +38,5 @@ public class HealthFormDTO {
 
     String deniedReason;
 
-    int status;
+    Integer status;
 }
