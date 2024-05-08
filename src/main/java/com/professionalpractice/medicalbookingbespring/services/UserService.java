@@ -11,6 +11,8 @@ import com.professionalpractice.medicalbookingbespring.dtos.request.UserRequest;
 public interface UserService {
     Page<UserDto> getUsers(PageRequest pageRequest);
 
+    Page<UserDto> getUsersByIsLocked(Boolean status,PageRequest pageRequest);
+
     UserDto createUser(UserRequest userRequest);
 
     UserDto getUserById(Long id);

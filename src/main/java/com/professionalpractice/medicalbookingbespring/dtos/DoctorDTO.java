@@ -33,7 +33,7 @@ public class DoctorDTO extends DateAuditingDto {
 
     String description;
 
-    Department department;
+    DepartmentDTO department;
 
-    Set<Shift> shifts;
+    Set<ShiftDTO> shifts;
 }
