@@ -49,7 +49,7 @@ public class EmailServiceImpl implements EmailService {
         content += "<li>Chuyên khoa: " + healthFormDto.getShift().getDoctor().getDepartment().getName() + "</li>";
         content += "<li>Bác sĩ: " + healthFormDto.getShift().getDoctor().getName() + "</li>";
         content += "<li>Vị trí phòng khám: " + healthFormDto.getShift().getPlace() + "</li>";
-        // content += "<li>Số thứ tự: " + healthFormDto.getStt() + "</li>";
+        content += "<li>Số thứ tự: " + healthFormDto.getAcceptedNumber() + "</li>";
         content += "</ul>";
         content += "<p>Vui lòng đến đúng giờ hẹn khám.</p>";
         content += "<p>Trân trọng,</p>";
