@@ -44,6 +44,7 @@ public class HealthFormServiceImpl implements HealthFormService {
                                 .namePatient(healthFormRequest.getNamePatient())
                                 .email(healthFormRequest.getEmail())
                                 .phoneNumber(healthFormRequest.getPhoneNumber())
+                                .address(healthFormRequest.getAddress())
                                 .shift(shift)
                                 .reason(healthFormRequest.getReason())
                                 .cccd(healthFormRequest.getCccdUrl())
@@ -102,11 +103,17 @@ public class HealthFormServiceImpl implements HealthFormService {
                 return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
         }
 
-
         @Override
         public Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest) {
                 Page<HealthForm> healthFormPage = healthFormRepository.queryHealthFormByStatus(status, pageRequest);
 
                 return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
+        }
+
+        @Override
+        public HealthFormDTO updateStatusOfHealthForm(Long heathFormId, HealthFormRequest healthFormRequest) {
+                HealthFormDTO healthFormDTO = updateHealthForm(heathFormId, healthFormRequest);
+
+                return healthFormDTO;
         }
 }

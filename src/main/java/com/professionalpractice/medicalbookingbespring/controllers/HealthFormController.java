@@ -8,7 +8,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.professionalpractice.medicalbookingbespring.config.RestApiV1;
@@ -16,6 +24,7 @@ import com.professionalpractice.medicalbookingbespring.dtos.HealthFormDTO;
 import com.professionalpractice.medicalbookingbespring.dtos.request.HealthFormRequest;
 import com.professionalpractice.medicalbookingbespring.dtos.response.PaginationResponse;
 import com.professionalpractice.medicalbookingbespring.services.CloudinaryService;
+import com.professionalpractice.medicalbookingbespring.services.EmailService;
 import com.professionalpractice.medicalbookingbespring.services.HealthFormService;
 import com.professionalpractice.medicalbookingbespring.utils.CustomResponse;
 
@@ -28,6 +37,8 @@ public class HealthFormController {
     private final HealthFormService healthFormService;
 
     private final CloudinaryService cloudinaryService;
+
+    private final EmailService emailService;
 
     @PostMapping("/health-forms")
     public ResponseEntity<?> createHealthForms(
@@ -90,8 +101,27 @@ public class HealthFormController {
 
     @PatchMapping("/health-forms/{healthFormId}")
     public ResponseEntity<?> aproveHealthForm(@PathVariable Long healthFormId,
-                                              @RequestBody HealthFormRequest healthFormRequest) {
+            @RequestBody HealthFormRequest healthFormRequest) {
         HealthFormDTO healthForm = healthFormService.updateHealthForm(healthFormId, healthFormRequest);
+        return CustomResponse.success("Cập nhật trạng thái thành công");
+    }
+
+    @PatchMapping("/health-forms/status/{healthFormId}")
+    public ResponseEntity<?> updateStatusOfHealthForm(@PathVariable Long healthFormId,
+            @RequestBody HealthFormRequest healthFormRequest) {
+        HealthFormDTO healthForm = healthFormService.updateStatusOfHealthForm(healthFormId, healthFormRequest);
+
+        switch (healthForm.getStatus()) {
+            case 1:
+                emailService.sendHealthFormConfirmation(healthForm);
+                break;
+            case 2:
+                emailService.sendHealthFormRejection(healthForm);
+                break;
+            default:
+                break;
+        }
+
         return CustomResponse.success("Cập nhật trạng thái thành công");
     }
 
