@@ -18,9 +18,11 @@ public interface HealthFormService {
 
     void deleteHealthFormById(Long healthFormId);
 
-    Page<HealthFormDTO> getHistory(String userEmail, PageRequest pageRequest);
+    Page<HealthFormDTO> getHistory(String userEmail, Integer status, PageRequest pageRequest);
 
-    Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest);
+    Page<HealthFormDTO> getHealthFormsByStatus(Integer status, PageRequest pageRequest);
 
     HealthFormDTO updateStatusOfHealthForm(Long heathFormId, HealthFormRequest healthFormRequest);
+
+    Page<HealthFormDTO> queryHealthForms(HealthFormRequest healthFormRequest, PageRequest pageRequest);
 }

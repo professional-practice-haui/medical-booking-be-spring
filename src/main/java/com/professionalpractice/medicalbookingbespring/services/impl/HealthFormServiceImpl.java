@@ -1,8 +1,12 @@
 package com.professionalpractice.medicalbookingbespring.services.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -17,103 +21,132 @@ import com.professionalpractice.medicalbookingbespring.repositories.ShiftReposit
 import com.professionalpractice.medicalbookingbespring.repositories.UserRepository;
 import com.professionalpractice.medicalbookingbespring.services.HealthFormService;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class HealthFormServiceImpl implements HealthFormService {
 
-        private final HealthFormRepository healthFormRepository;
+    private final HealthFormRepository healthFormRepository;
 
-        private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-        private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-        private final ShiftRepository shiftRepository;
+    private final ShiftRepository shiftRepository;
 
-        @Override
-        public HealthFormDTO createHealthForm(HealthFormRequest healthFormRequest) {
-                String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-                User user = userRepository.findByEmail(userEmail)
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
-                Shift shift = shiftRepository.findById(healthFormRequest.getShift())
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc này này"));
+    @Override
+    public HealthFormDTO createHealthForm(HealthFormRequest healthFormRequest) {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
+        Shift shift = shiftRepository.findById(healthFormRequest.getShift())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy ca làm việc này này"));
 
-                HealthForm healthForm = HealthForm.builder()
-                                .user(user)
-                                .namePatient(healthFormRequest.getNamePatient())
-                                .email(healthFormRequest.getEmail())
-                                .phoneNumber(healthFormRequest.getPhoneNumber())
-                                .address(healthFormRequest.getAddress())
-                                .shift(shift)
-                                .reason(healthFormRequest.getReason())
-                                .cccd(healthFormRequest.getCccdUrl())
-                                .bhyt(healthFormRequest.getBhytUrl())
-                                .deniedReason(healthFormRequest.getDeniedReason())
-                                .status(0)
-                                .build();
+        HealthForm healthForm = HealthForm.builder()
+                .user(user)
+                .namePatient(healthFormRequest.getNamePatient())
+                .email(healthFormRequest.getEmail())
+                .phoneNumber(healthFormRequest.getPhoneNumber())
+                .address(healthFormRequest.getAddress())
+                .shift(shift)
+                .reason(healthFormRequest.getReason())
+                .cccd(healthFormRequest.getCccdUrl())
+                .bhyt(healthFormRequest.getBhytUrl())
+                .deniedReason(healthFormRequest.getDeniedReason())
+                .status(0)
+                .acceptedNumber(0)
+                .build();
 
-                HealthForm saveHealthForm = healthFormRepository.save(healthForm);
-                return modelMapper.map(saveHealthForm, HealthFormDTO.class);
+        HealthForm saveHealthForm = healthFormRepository.save(healthForm);
+        return modelMapper.map(saveHealthForm, HealthFormDTO.class);
+    }
+
+    @Override
+    public Page<HealthFormDTO> getHealthFormByUserId(Long userId, PageRequest pageRequest) {
+        Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(userId, pageRequest);
+
+        return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
+    }
+
+    @Override
+    public Page<HealthFormDTO> getHealthForms(PageRequest pageRequest) {
+        Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(pageRequest);
+        return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
+    }
+
+    @Override
+    public HealthFormDTO updateHealthForm(Long healthFormId, HealthFormRequest healthFormRequest) {
+        HealthForm healthForm = healthFormRepository.findById(healthFormId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn khám"));
+
+        if (healthFormRequest.getStatus() != 0) {
+            int acceptedNumber = healthFormRepository.countByShiftId(healthForm.getShift().getId());
+            if (healthFormRequest.getStatus() == 1) {
+                healthForm.setAcceptedNumber(acceptedNumber + 1);
+            }
+
+            healthForm.setStatus(healthFormRequest.getStatus());
         }
 
-        @Override
-        public Page<HealthFormDTO> getHealthFormByUserId(Long userId, PageRequest pageRequest) {
-                Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(userId, pageRequest);
-
-                return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
+        if (healthFormRequest.getDeniedReason() != null) {
+            healthForm.setDeniedReason(healthFormRequest.getDeniedReason());
         }
 
-        @Override
-        public Page<HealthFormDTO> getHealthForms(PageRequest pageRequest) {
-                Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(pageRequest);
-                return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
-        }
+        HealthForm saveHealthForm = healthFormRepository.save(healthForm);
+        return modelMapper.map(saveHealthForm, HealthFormDTO.class);
+    }
 
-        @Override
-        public HealthFormDTO updateHealthForm(Long healthFormId, HealthFormRequest healthFormRequest) {
-                HealthForm healthForm = healthFormRepository.findById(healthFormId)
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn khám"));
+    @Override
+    public void deleteHealthFormById(Long healthFormId) {
+        HealthForm healthForm = healthFormRepository.findById(healthFormId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn khám"));
+        healthFormRepository.deleteById(healthFormId);
+    }
 
-                if (healthFormRequest.getStatus() != 0) {
-                        healthForm.setStatus(healthFormRequest.getStatus());
-                }
+    @Override
+    public Page<HealthFormDTO> getHistory(String userEmail, Integer status, PageRequest pageRequest) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
 
-                if (healthFormRequest.getDeniedReason() != null) {
-                        healthForm.setDeniedReason(healthFormRequest.getDeniedReason());
-                }
+        HealthFormRequest healthFormRequest = new HealthFormRequest();
+        healthFormRequest.setUserId(user.getId());
+        healthFormRequest.setStatus(status);
 
-                HealthForm saveHealthForm = healthFormRepository.save(healthForm);
-                return modelMapper.map(saveHealthForm, HealthFormDTO.class);
-        }
+        return queryHealthForms(healthFormRequest, pageRequest);
+    }
 
-        @Override
-        public void deleteHealthFormById(Long healthFormId) {
-                HealthForm healthForm = healthFormRepository.findById(healthFormId)
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn khám"));
-                healthFormRepository.deleteById(healthFormId);
-        }
+    @Override
+    public Page<HealthFormDTO> getHealthFormsByStatus(Integer status, PageRequest pageRequest) {
+        HealthFormRequest healthFormRequest = new HealthFormRequest();
+        healthFormRequest.setStatus(status);
 
-        @Override
-        public Page<HealthFormDTO> getHistory(String userEmail, PageRequest pageRequest) {
-                User user = userRepository.findByEmail(userEmail)
-                                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
-                Page<HealthForm> healthFormPage = healthFormRepository.queryHealthForm(user.getId(), pageRequest);
+        return queryHealthForms(healthFormRequest, pageRequest);
+    }
 
-                return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
-        }
+    @Override
+    public HealthFormDTO updateStatusOfHealthForm(Long heathFormId, HealthFormRequest healthFormRequest) {
+        HealthFormDTO healthFormDTO = updateHealthForm(heathFormId, healthFormRequest);
 
-        @Override
-        public Page<HealthFormDTO> getHealthFormByStatus(Integer status, PageRequest pageRequest) {
-                Page<HealthForm> healthFormPage = healthFormRepository.queryHealthFormByStatus(status, pageRequest);
+        return healthFormDTO;
+    }
 
-                return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));
-        }
+    @Override
+    public Page<HealthFormDTO> queryHealthForms(HealthFormRequest healthFormRequest, PageRequest pageRequest) {
+        Specification<HealthForm> specification = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (healthFormRequest.getUserId() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("user").get("id"), healthFormRequest.getUserId()));
+            }
+            if (healthFormRequest.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), healthFormRequest.getStatus()));
+            }
 
-        @Override
-        public HealthFormDTO updateStatusOfHealthForm(Long heathFormId, HealthFormRequest healthFormRequest) {
-                HealthFormDTO healthFormDTO = updateHealthForm(heathFormId, healthFormRequest);
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
 
-                return healthFormDTO;
-        }
+        Page<HealthForm> healthFormPage = healthFormRepository.findAll(specification, pageRequest);
+        return healthFormPage.map(healthForm -> modelMapper.map(healthForm, HealthFormDTO.class));
+    }
 }

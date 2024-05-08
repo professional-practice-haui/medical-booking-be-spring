@@ -58,8 +58,11 @@ public class HealthForm {
     @Column(name = "bhyt")
     String bhyt;
 
-    @Column(name = "deniedReason")
+    @Column(name = "denied_reason")
     String deniedReason;
 
     Integer status;
+
+    @Column(name = "accepted_number")
+    Integer acceptedNumber;
 }
