@@ -22,6 +22,8 @@ public class HealthFormRequest {
 
     String phoneNumber;
 
+    String address;
+
     Long shift;
 
     String reason;
