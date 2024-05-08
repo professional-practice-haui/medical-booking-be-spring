@@ -15,6 +15,7 @@ import com.professionalpractice.medicalbookingbespring.dtos.request.HealthFormRe
 import com.professionalpractice.medicalbookingbespring.entities.HealthForm;
 import com.professionalpractice.medicalbookingbespring.entities.Shift;
 import com.professionalpractice.medicalbookingbespring.entities.User;
+import com.professionalpractice.medicalbookingbespring.exceptions.BadRequestException;
 import com.professionalpractice.medicalbookingbespring.exceptions.NotFoundException;
 import com.professionalpractice.medicalbookingbespring.repositories.HealthFormRepository;
 import com.professionalpractice.medicalbookingbespring.repositories.ShiftRepository;
@@ -84,6 +85,9 @@ public class HealthFormServiceImpl implements HealthFormService {
         if (healthFormRequest.getStatus() != 0) {
             int acceptedNumber = healthFormRepository.countByShiftId(healthForm.getShift().getId());
             if (healthFormRequest.getStatus() == 1) {
+                if (healthForm.getShift().getMaxSlot() == acceptedNumber) {
+                    throw new BadRequestException("Ca khám đã đầy");
+                }
                 healthForm.setAcceptedNumber(acceptedNumber + 1);
             }
 
