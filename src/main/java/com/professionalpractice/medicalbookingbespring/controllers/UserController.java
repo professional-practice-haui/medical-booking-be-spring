@@ -38,12 +38,18 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getUsers(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+                                      @RequestParam(defaultValue = "10") int limit,
+                                      @RequestParam(required = false) Boolean isLocked) {
         PageRequest pageRequest = PageRequest.of(
                 page - 1, limit,
                 Sort.by("id").ascending());
-        Page<UserDto> userPage = userService.getUsers(pageRequest);
-
+        Page<UserDto> userPage;
+        if(isLocked != null) {
+            userPage = userService.getUsersByIsLocked(isLocked,pageRequest);
+        }
+        else {
+            userPage = userService.getUsers(pageRequest);
+        }
         long totalPages = userPage.getTotalElements();
         List<UserDto> users = userPage.getContent();
 

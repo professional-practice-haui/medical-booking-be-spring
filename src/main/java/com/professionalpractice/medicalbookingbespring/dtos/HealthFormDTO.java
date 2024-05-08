@@ -15,7 +15,7 @@ public class HealthFormDTO {
 
     Long id;
 
-    User user;
+    UserDto user;
 
     String namePatient;
 
@@ -23,7 +23,7 @@ public class HealthFormDTO {
 
     String phoneNumber;
 
-    Shift shift;
+    ShiftDTO shift;
 
     String reason;
 
@@ -33,5 +33,5 @@ public class HealthFormDTO {
 
     String deniedReason;
 
-    int status;
+    Integer status;
 }
