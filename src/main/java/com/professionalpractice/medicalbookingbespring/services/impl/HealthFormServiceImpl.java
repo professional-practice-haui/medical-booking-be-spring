@@ -104,7 +104,7 @@ public class HealthFormServiceImpl implements HealthFormService {
 
 
         @Override
-        public Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest) {
+        public Page<HealthFormDTO> getHealthFormByStatus(Integer status, PageRequest pageRequest) {
                 Page<HealthForm> healthFormPage = healthFormRepository.queryHealthFormByStatus(status, pageRequest);
 
                 return healthFormPage.map(theHealthForm -> modelMapper.map(theHealthForm, HealthFormDTO.class));

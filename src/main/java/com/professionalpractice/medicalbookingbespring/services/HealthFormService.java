@@ -20,5 +20,5 @@ public interface HealthFormService {
 
     Page<HealthFormDTO> getHistory(String userEmail, PageRequest pageRequest);
 
-    Page<HealthFormDTO> getHealthFormByStatus(String status, PageRequest pageRequest);
+    Page<HealthFormDTO> getHealthFormByStatus(Integer status, PageRequest pageRequest);
 }
