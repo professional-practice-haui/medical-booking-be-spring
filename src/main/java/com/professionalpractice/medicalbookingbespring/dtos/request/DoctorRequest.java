@@ -20,8 +20,6 @@ public class DoctorRequest {
 
     String name;
 
-    String gender;
-
     String degree;
 
     int experience;
@@ -32,5 +30,4 @@ public class DoctorRequest {
 
     Long department;
 
-    List<Long> shifts;
 }

@@ -54,7 +54,7 @@ public class HealthFormController {
         }
 
         HealthFormDTO healthForm = healthFormService.createHealthForm(healthFormRequest);
-        return CustomResponse.success(HttpStatus.CREATED, "Tạp đơn khám thành công", healthForm);
+        return CustomResponse.success(HttpStatus.CREATED, "Tạo đơn khám thành công", healthForm);
     }
 
     @GetMapping("/health-forms")
