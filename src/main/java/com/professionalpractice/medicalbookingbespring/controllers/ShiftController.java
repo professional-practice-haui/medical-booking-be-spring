@@ -54,7 +54,7 @@ public class ShiftController {
     @DeleteMapping("/shifts/{shiftId}")
     public ResponseEntity<?> deleteShift(@PathVariable Long shiftId) {
         shiftService.deleteShiftById(shiftId);
-        return CustomResponse.success("Cập nhật thành công");
+        return CustomResponse.success("Xóa ca làm việc thành công");
     }
 
 
